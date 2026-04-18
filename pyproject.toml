@@ -1,0 +1,15 @@
+[project]
+name = "cdk-linter"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.scripts]
+linter = "cdk_linter.runner:run"
+dev = "cdk_linter.dev:run"
+clean = "cdk_linter.dev:clean"
+
+[tool.uv]
+package = true
