@@ -4,12 +4,22 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "fire>=0.7.1",
+    "tree-sitter>=0.25.2",
+    "tree-sitter-typescript>=0.23.2",
+]
 
 [project.scripts]
 linter = "cdk_linter.runner:run"
 dev = "cdk_linter.dev:run"
 clean = "cdk_linter.dev:clean"
+tsparser = "cdk_linter.parsers.tsparser:main"
 
 [tool.uv]
 package = true
+
+[dependency-groups]
+dev = [
+    "black>=26.3.1",
+]
