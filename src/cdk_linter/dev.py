@@ -1,6 +1,8 @@
 from pathlib import Path
 import shutil
 
+from cdk_linter.parsers.cfn_template_parser import CfnTemplateParser
+
 
 def run():
     """
@@ -8,6 +10,8 @@ def run():
     Usage: `uv run dev`
     """
     print("Running CDK linter in dev mode...")
+    parser = CfnTemplateParser()
+    parser.parse("data/cdk.out/SampleStack.template.json")
 
 
 def clean():
