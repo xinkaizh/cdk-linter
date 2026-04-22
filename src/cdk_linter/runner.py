@@ -7,8 +7,8 @@ from pathlib import Path
 import fire
 
 import cdk_linter.rules as _rules_pkg
+from cdk_linter.parsers.tsparser import Diagnostic, FileStatementTree, parse_directory
 from cdk_linter.rules import BaseRule, TSRule
-from cdk_linter.parsers.tsparser import Diagnostic, StatementTree, parse_directory
 
 logger = logging.getLogger(__name__)
 
@@ -57,14 +57,16 @@ def lint_ts(data_dir: str = "data", verbose: bool = False) -> None:
     rules: list[TSRule] = [r for r in _discover_rules() if isinstance(r, TSRule)]
     logger.info("Running %d TS rule(s)", len(rules))
 
-    statements: list[StatementTree] = parse_directory(Path(data_dir))
+    parsed_files: list[FileStatementTree] = parse_directory(Path(data_dir))
 
     total_diagnostics = 0
     for rule in rules:
         try:
-            diagnostics: list[Diagnostic] = rule.check(statements)
+            diagnostics: list[Diagnostic] = rule.check(parsed_files)
         except Exception:
-            logger.error("Rule %s raised an exception", type(rule).__name__, exc_info=True)
+            logger.error(
+                "Rule %s raised an exception", type(rule).__name__, exc_info=True
+            )
             continue
         for diag in diagnostics:
             placeholder_emit_as_lsp_diagnostic(diag.file, diag.line, diag.message)
@@ -74,8 +76,7 @@ def lint_ts(data_dir: str = "data", verbose: bool = False) -> None:
 
 
 def lint_cfn() -> None:
-    """Lint all CloudFormation templates.
-    """
+    """Lint all CloudFormation templates."""
     raise NotImplementedError("Not implemented yet")
 
 
@@ -84,7 +85,9 @@ def run() -> None:
     Main code entry point for CDK Linter.
     Usage: `uv run linter`
     """
-    fire.Fire({
-        'ts': lint_ts,
-        'cfn': lint_cfn,
-    })
+    fire.Fire(
+        {
+            "ts": lint_ts,
+            "cfn": lint_cfn,
+        }
+    )

@@ -3,7 +3,7 @@ from enum import Enum, auto
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from cdk_linter.parsers.tsparser import Diagnostic, StatementTree
+    from cdk_linter.parsers.tsparser import Diagnostic, FileStatementTree
 
 
 class RuleKind(Enum):
@@ -19,7 +19,7 @@ class TSRule(BaseRule, ABC):
     kind = RuleKind.TS
 
     @abstractmethod
-    def check(self, statements: "list[StatementTree]") -> "list[Diagnostic]": ...
+    def check(self, files: "list[FileStatementTree]") -> "list[Diagnostic]": ...
 
 
 # NOTE: Uncomment once CFNRules exists

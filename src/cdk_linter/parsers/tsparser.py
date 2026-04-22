@@ -1,10 +1,12 @@
 from dataclasses import dataclass, field
 import logging
+import os.path
 from os import PathLike
 from pathlib import Path
-from typing import NamedTuple
-import fire
+from typing import NamedTuple, Any
+import msgspec
 
+import fire
 from tree_sitter import Language, Node, Parser
 import tree_sitter_typescript as tstypescript
 
@@ -38,6 +40,19 @@ STRUCTURAL_CONTAINERS: frozenset[str] = frozenset(
     }
 )
 
+EXCLUDED_DIR_NAMES: frozenset[str] = frozenset(
+    {
+        "cdk.out",
+        "node_modules",
+        "dist",
+        "build",
+        ".git",
+        ".venv",
+        "venv",
+        "__pycache__",
+    }
+)
+
 
 class Diagnostic(NamedTuple):
     file: Path
@@ -46,50 +61,94 @@ class Diagnostic(NamedTuple):
 
 
 @dataclass
+class ParameterTree:
+    type: str
+    start_line: int
+    end_line: int
+    snippet: str
+
+
+@dataclass
 class StatementTree:
-    node: Node
-    file: Path
-    source: bytes
+    type: str
+    start_line: int
+    end_line: int
+    snippet: str
     children: list["StatementTree"] = field(default_factory=list)
-
-    @property
-    def start_line(self) -> int:
-        return self.node.start_point.row + 1
+    parameters: list[ParameterTree] = field(default_factory=list)
 
 
-def _collect_inner(
-    node: Node, file: Path, source: bytes, seen: set[int]
-) -> list[StatementTree]:
-    results: list[StatementTree] = []
-    for child in node.children:
-        if child.type in STATEMENT_TYPES:
-            if child.id not in seen:
-                seen.add(child.id)
-                inner = _collect_inner(child, file, source, seen)
-                results.append(StatementTree(node=child, file=file, source=source, children=inner))
-        else:
-            results.extend(_collect_inner(child, file, source, seen))
-    return results
+@dataclass
+class FileStatementTree:
+    file: Path
+    statements: list[StatementTree]
+
+
+def _decode_snippet(source: bytes, node: Node) -> str:
+    return source[node.start_byte : node.end_byte].decode("utf-8", errors="replace")
+
+
+def _build_parameter_tree(node: Node, source: bytes) -> ParameterTree:
+    return ParameterTree(
+        type=node.type,
+        start_line=node.start_point.row + 1,
+        end_line=node.end_point.row + 1,
+        snippet=_decode_snippet(source, node),
+    )
+
+
+def _extract_parameters(node: Node, source: bytes) -> list[ParameterTree]:
+    parameters: list[ParameterTree] = []
+    seen_parameter_ids: set[int] = set()
+
+    for field_name in ("arguments", "parameters", "formal_parameters"):
+        parameter_container = node.child_by_field_name(field_name)
+        if parameter_container is None:
+            continue
+        for parameter_node in parameter_container.named_children:
+            if parameter_node.type == "comment":
+                continue
+            if parameter_node.id in seen_parameter_ids:
+                continue
+            seen_parameter_ids.add(parameter_node.id)
+            parameters.append(_build_parameter_tree(parameter_node, source))
+
+    return parameters
+
+
+def _build_statement_tree(node: Node, source: bytes) -> StatementTree:
+    children = [_build_statement_tree(child, source) for child in node.named_children]
+    return StatementTree(
+        type=node.type,
+        start_line=node.start_point.row + 1,
+        end_line=node.end_point.row + 1,
+        snippet=_decode_snippet(source, node),
+        children=children,
+        parameters=_extract_parameters(node, source),
+    )
 
 
 def _collect_statements(
-    node: Node, results: list[StatementTree], file: Path, source: bytes, seen: set[int]
+    node: Node,
+    results: list[StatementTree],
+    source: bytes,
 ) -> None:
-    node_type = node.type
-
-    if node_type in STATEMENT_TYPES:
-        if node.id not in seen:
-            seen.add(node.id)
-            children = _collect_inner(node, file, source, seen)
-            results.append(StatementTree(node=node, file=file, source=source, children=children))
+    if node.type in STATEMENT_TYPES:
+        results.append(_build_statement_tree(node, source))
         return
 
-    if node_type in STRUCTURAL_CONTAINERS:
-        for child in node.children:
-            _collect_statements(child, results, file, source, seen)
+    if node.type in STRUCTURAL_CONTAINERS:
+        for child in node.named_children:
+            _collect_statements(child, results, source)
 
 
-def parse_file(file: PathLike) -> list[StatementTree]:
+def _is_relevant_ts_file(file: Path) -> bool:
+    if file.suffix != ".ts":
+        return False
+    return not any(part in EXCLUDED_DIR_NAMES for part in file.parts)
+
+
+def parse_file(file: PathLike) -> FileStatementTree:
     logger.debug("Parsing %s", file)
     file_path = Path(file)
     try:
@@ -102,31 +161,49 @@ def parse_file(file: PathLike) -> list[StatementTree]:
     tree = parser.parse(source)
 
     statements: list[StatementTree] = []
-    seen: set[int] = set()
-    _collect_statements(tree.root_node, statements, file_path, source, seen)
+    _collect_statements(tree.root_node, statements, source)
 
     logger.debug("Found %d statement(s) in %s", len(statements), file_path)
-    return statements
+    return FileStatementTree(file=file_path, statements=statements)
 
 
-def parse_directory(root: PathLike) -> list[StatementTree]:
+def parse_directory(root: PathLike) -> list[FileStatementTree]:
     logger.info("Scanning %s for TypeScript files", root)
-    root_file = Path(root)
-    ts_files = sorted(root_file.rglob("*.ts"))
-    logger.debug("Found %d .ts file(s): %s", len(ts_files), [str(f) for f in ts_files])
+    root_path = Path(root)
+    ts_files = sorted(
+        file for file in root_path.rglob("*.ts") if _is_relevant_ts_file(file)
+    )
+    logger.debug(
+        "Found %d relevant .ts file(s): %s", len(ts_files), [str(f) for f in ts_files]
+    )
 
-    all_statements: list[StatementTree] = []
-    for ts_file in ts_files:
-        all_statements.extend(parse_file(ts_file))
+    parsed_files = [parse_file(ts_file) for ts_file in ts_files]
+    total_statements = sum(len(parsed.statements) for parsed in parsed_files)
 
     logger.info(
         "Parsed %d statement(s) from %d file(s) in %s",
-        len(all_statements),
-        len(ts_files),
+        total_statements,
+        len(parsed_files),
         root,
     )
-    return all_statements
+    return parsed_files
 
 
-def main():
-    fire.Fire(parse_file)
+def _main_parse_file_entrypoint(path: PathLike) -> str | None:
+    """Parses a file and dumps the FileStatementTree object"""
+
+    def enc_hook(obj: Any) -> Any:
+        if isinstance(obj, Path):
+            return str(obj)
+        return None
+
+    if not os.path.exists(path):
+        logger.error("Path %s does not exist.", path)
+        return None
+
+    result = parse_file(path)
+    return msgspec.json.encode(result, enc_hook=enc_hook).decode()
+
+
+def main() -> None:
+    fire.Fire(_main_parse_file_entrypoint)
