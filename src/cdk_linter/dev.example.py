@@ -1,6 +1,10 @@
 from pathlib import Path
 import shutil
 
+"""
+Example dev file. Please make a copy of this file and rename it to `dev.py`
+Git tracks this example file, but not your actual dev.py
+"""
 
 def run():
     """
