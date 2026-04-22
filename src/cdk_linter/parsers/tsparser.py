@@ -61,21 +61,12 @@ class Diagnostic(NamedTuple):
 
 
 @dataclass
-class ParameterTree:
-    type: str
-    start_line: int
-    end_line: int
-    snippet: str
-
-
-@dataclass
 class StatementTree:
     type: str
     start_line: int
     end_line: int
     snippet: str
     children: list["StatementTree"] = field(default_factory=list)
-    parameters: list[ParameterTree] = field(default_factory=list)
 
 
 @dataclass
@@ -88,34 +79,6 @@ def _decode_snippet(source: bytes, node: Node) -> str:
     return source[node.start_byte : node.end_byte].decode("utf-8", errors="replace")
 
 
-def _build_parameter_tree(node: Node, source: bytes) -> ParameterTree:
-    return ParameterTree(
-        type=node.type,
-        start_line=node.start_point.row + 1,
-        end_line=node.end_point.row + 1,
-        snippet=_decode_snippet(source, node),
-    )
-
-
-def _extract_parameters(node: Node, source: bytes) -> list[ParameterTree]:
-    parameters: list[ParameterTree] = []
-    seen_parameter_ids: set[int] = set()
-
-    for field_name in ("arguments", "parameters", "formal_parameters"):
-        parameter_container = node.child_by_field_name(field_name)
-        if parameter_container is None:
-            continue
-        for parameter_node in parameter_container.named_children:
-            if parameter_node.type == "comment":
-                continue
-            if parameter_node.id in seen_parameter_ids:
-                continue
-            seen_parameter_ids.add(parameter_node.id)
-            parameters.append(_build_parameter_tree(parameter_node, source))
-
-    return parameters
-
-
 def _build_statement_tree(node: Node, source: bytes) -> StatementTree:
     children = [_build_statement_tree(child, source) for child in node.named_children]
     return StatementTree(
@@ -124,7 +87,6 @@ def _build_statement_tree(node: Node, source: bytes) -> StatementTree:
         end_line=node.end_point.row + 1,
         snippet=_decode_snippet(source, node),
         children=children,
-        parameters=_extract_parameters(node, source),
     )
 
 

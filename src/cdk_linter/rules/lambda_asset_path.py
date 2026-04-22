@@ -28,6 +28,22 @@ def _is_from_asset_call(node: StatementTree) -> bool:
     return function_node.children[-1].snippet == "fromAsset"
 
 
+def _get_first_argument(node: StatementTree) -> StatementTree | None:
+    if node.type != "call_expression":
+        return None
+
+    arguments_node = next(
+        (child for child in node.children if child.type == "arguments"), None
+    )
+    if arguments_node is None:
+        return None
+
+    for argument in arguments_node.children:
+        if argument.type != "comment":
+            return argument
+    return None
+
+
 def _check_statement(
     stmt: StatementTree, file: Path, violations: list[Diagnostic]
 ) -> None:
@@ -35,10 +51,9 @@ def _check_statement(
         if not _is_from_asset_call(node):
             continue
 
-        if not node.parameters:
+        first_arg = _get_first_argument(node)
+        if first_arg is None:
             continue
-
-        first_arg = node.parameters[0]
         if first_arg.type != "string":
             continue
 
