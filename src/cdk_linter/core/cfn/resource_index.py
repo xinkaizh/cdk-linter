@@ -11,11 +11,27 @@ class ResourceIndex:
         self._by_id[resource.id] = resource
         self._by_type.setdefault(resource.type, []).append(resource)
 
-    def get_resource_by_id(self, id: str) -> CfnResource:
+    def get_resource_by_id(self, id: str) -> CfnResource | None:
         return self._by_id.get(id, None)
 
     def get_resources_by_type(self, type: ResourceType) -> list[CfnResource]:
         return self._by_type.get(type, [])
+
+    def find_resource_by_prefix(
+        self,
+        id_prefix: str,
+        include_types: list[ResourceType] = [],
+        exclude_types: list[ResourceType] = [],
+    ) -> CfnResource | None:
+        if include_types and exclude_types:
+            raise ValueError("Only allowed to specify either include_types or exclude_types")
+        for k, v in self._by_id.items():
+            if k.startswith(id_prefix):
+                if include_types and v.type in include_types:
+                    return v
+                if exclude_types and v.type not in exclude_types:
+                    return v
+        return None
 
     def get_all_resources(self) -> list[CfnResource]:
         return self._by_id.values()

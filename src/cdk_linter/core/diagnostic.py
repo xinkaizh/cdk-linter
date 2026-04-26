@@ -1,8 +1,9 @@
+from dataclasses import dataclass
 from pathlib import Path
-from typing import NamedTuple
 
 
-class Diagnostic(NamedTuple):
-    file: Path
-    line: int
-    message: str
+@dataclass
+class Diagnostic:
+    file: Path | None = None
+    line: int | None = None
+    message: str | None = None

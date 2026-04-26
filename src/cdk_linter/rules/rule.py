@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 
@@ -16,6 +17,15 @@ class RuleType(Enum):
 
 class BaseRule(ABC):
     kind: RuleType
+    description: str
+
+    def __init_subclass__(cls, **kwargs):
+        super().__init_subclass__(**kwargs)
+        # Skip abstract intermediate classes: TsRule, CfnRule
+        if inspect.isabstract(cls):
+            return
+        if "description" not in cls.__dict__:
+            raise TypeError(f"{cls.__name__} must define 'description'")
 
 
 class TsRule(BaseRule, ABC):

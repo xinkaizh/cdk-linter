@@ -11,21 +11,24 @@ from cdk_linter.core.diagnostic import Diagnostic
 from cdk_linter.core.ts.statement_tree import FileStatementTree
 from cdk_linter.parsers.cfn_parser import CfnParser
 from cdk_linter.parsers.ts_parser import parse_directory
+from cdk_linter.rules.cfn.lambda_permission_rule import LambdaPermissionRule
 from cdk_linter.rules.rule import BaseRule, CfnRule, TsRule
+from cdk_linter.utils.pretty_logging import CHECK, CROSS, RED, RESET, ColorAdapter
 from cdk_linter.utils.visualize_graph import visualize
-
-logger = logging.getLogger(__name__)
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(levelname)s | %(module)s | %(message)s",
+    format="%(levelname)7s | %(module)s | %(message)s",
 )
+logging.getLogger("cdk_linter.parsers.cfn_parser").setLevel(logging.ERROR)
+logger = ColorAdapter(logging.getLogger(__name__), {})
 
 
 def placeholder_emit_as_lsp_diagnostic(file: Path, line: int, message: str) -> None:
     # Placeholder for now. Ideally we'll send it out as a LSP message, but I
     # think that'll be the orchestrator's job
-    print(f"{file}:{line}: {message}")
+    locator = f"{file}:{line} " if file else ""
+    logger.error(f"{RED}{CROSS} {locator}{message}{RESET}")
 
 
 def _discover_rules() -> list[BaseRule]:
@@ -58,13 +61,15 @@ def lint_ts(data_dir: str = "data/job_service", verbose: bool = False) -> None:
     """
     logger.info("Starting TypeScript lint on %s", data_dir)
 
-    rules: list[TsRule] = [r for r in _discover_rules() if isinstance(r, TsRule)]
-    logger.info("Running %d TS rule(s)", len(rules))
-
+    logger.info("Parsing TS files...")
     parsed_files: list[FileStatementTree] = parse_directory(Path(data_dir))
+
+    rules: list[TsRule] = [r for r in _discover_rules() if isinstance(r, TsRule)]
+    logger.info("Founds %d CFN rule(s)", len(rules))
 
     total_diagnostics = 0
     for rule in rules:
+        logger.info("Running rule: %s", rule.description)
         try:
             diagnostics: list[Diagnostic] = rule.check(parsed_files)
         except Exception:
@@ -74,17 +79,18 @@ def lint_ts(data_dir: str = "data/job_service", verbose: bool = False) -> None:
             placeholder_emit_as_lsp_diagnostic(diag.file, diag.line, diag.message)
         total_diagnostics += len(diagnostics)
 
-    logger.info("Lint complete: %d diagnostic(s) emitted", total_diagnostics)
+    if total_diagnostics == 0:
+        logger.info(f"{CHECK} Lint complete: no issues found")
+    else:
+        logger.info("Lint complete: %d diagnostic(s) emitted", total_diagnostics)
 
 
 def lint_cfn(cdk_app_root: str = "data/job_service", stack_name: str = "SampleStack") -> None:
     """Only supports linting a single stack for now"""
     path = Path(cdk_app_root) / "cdk.out" / f"{stack_name}.template.json"
-    logger.info("Starting CloudFormation lint on %s", path)
+    logger.info("Start linting CloudFormation template at %s", path)
 
-    rules: list[CfnRule] = [r for r in _discover_rules() if isinstance(r, CfnRule)]
-    logger.info("Running %d CFN rule(s)", len(rules))
-
+    logger.info(f"Parsing CloudFormation template...")
     parser = CfnParser()
     parser.parse(path)
     graph = parser.get_resource_graph()
@@ -92,18 +98,31 @@ def lint_cfn(cdk_app_root: str = "data/job_service", stack_name: str = "SampleSt
 
     visualize(graph)
 
+    rules: list[CfnRule] = [r for r in _discover_rules() if isinstance(r, CfnRule)]
+    logger.info("Founds %d CFN rule(s)", len(rules))
+
     total_diagnostics = 0
     for rule in rules:
+        logger.info("Running rule: %s", rule.description)
         try:
+            # temporary solution for taking in a spec
+            if isinstance(rule, LambdaPermissionRule):
+                rule.prime(Path(cdk_app_root) / "spec.txt")
+
             diagnostics: list[Diagnostic] = rule.check(graph, index)
         except Exception:
             logger.error("Rule %s raised an exception", type(rule).__name__, exc_info=True)
             continue
+
         for diag in diagnostics:
             placeholder_emit_as_lsp_diagnostic(diag.file, diag.line, diag.message)
+
         total_diagnostics += len(diagnostics)
 
-    logger.info("Lint complete: %d diagnostic(s) emitted", total_diagnostics)
+    if total_diagnostics == 0:
+        logger.info(f"{CHECK} Lint complete: no issues found")
+    else:
+        logger.info("Lint complete: %d diagnostic(s) emitted", total_diagnostics)
 
 
 def run() -> None:

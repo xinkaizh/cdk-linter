@@ -47,8 +47,8 @@ class CfnParser:
                     self._handle_iam_policy(res)
                 case ResourceType.LAMBDA:
                     self._handle_lambda_function(res)
-                case _:
-                    logger.warning(f"{res.id}: handling of {res.type.name} hasn't been implemented")
+                case ResourceType.DDB | ResourceType.SQS | ResourceType.S3 | ResourceType.ROLE:
+                    pass  # no-op for now
 
     def get_resource_index(self) -> ResourceIndex:
         if not self._resource_index:

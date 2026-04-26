@@ -75,6 +75,8 @@ def _check_statement(stmt: StatementTree, file: Path, violations: list[Diagnosti
 
 
 class LambdaAssetPath(TsRule):
+    description = "Checks if asset path for Lambda function is properly configured"
+
     def check(self, files: list[FileStatementTree]) -> list[Diagnostic]:
         statement_count = sum(len(file_tree.statements) for file_tree in files)
         logger.debug(
