@@ -1,5 +1,11 @@
+import logging
 from pathlib import Path
 import shutil
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s | %(name)s | %(message)s",
+)
 
 """
 Example dev file. Please make a copy of this file and rename it to `dev.py`

@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "fire>=0.7.1",
+    "graphviz>=0.21",
     "msgspec>=0.21.1",
     "tree-sitter>=0.25.2",
     "tree-sitter-typescript>=0.23.2",
