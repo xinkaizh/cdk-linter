@@ -3,11 +3,11 @@ import os.path
 from os import PathLike
 from pathlib import Path
 from typing import Any
-import msgspec
 
 import fire
-from tree_sitter import Language, Node, Parser
+import msgspec
 import tree_sitter_typescript as tstypescript
+from tree_sitter import Language, Node, Parser
 
 from cdk_linter.core.ts.statement_tree import FileStatementTree, StatementTree
 

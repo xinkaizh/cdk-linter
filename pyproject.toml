@@ -18,6 +18,13 @@ dev = "cdk_linter.dev:run"
 clean = "cdk_linter.dev:clean"
 tsparser = "cdk_linter.parsers.ts_parser:main"
 
+[dependency-groups]
+dev = [
+    "autoflake>=2.3.0",
+    "black>=26.3.1",
+    "isort>=5.13.0",
+]
+
 [tool.uv]
 package = true
 
@@ -26,7 +33,11 @@ line-length = 100
 target-version = ["py312"]
 extend-exclude = "data"
 
-[dependency-groups]
-dev = [
-    "black>=26.3.1",
-]
+[tool.isort]
+profile = "black"
+line_length = 100
+skip = ["data"]
+
+[tool.autoflake]
+remove-all-unused-imports = true
+remove-unused-variables = true

@@ -3,8 +3,8 @@ from pathlib import Path
 from typing import Iterator
 
 from cdk_linter.core.diagnostic import Diagnostic
-from cdk_linter.rules.rule import TsRule
 from cdk_linter.core.ts.statement_tree import FileStatementTree, StatementTree
+from cdk_linter.rules.rule import TsRule
 
 logger = logging.getLogger(__name__)
 

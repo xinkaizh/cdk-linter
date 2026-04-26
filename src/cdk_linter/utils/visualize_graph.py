@@ -1,6 +1,7 @@
 import importlib
 import logging
 from pathlib import Path
+
 from cdk_linter.core.cfn.resource_graph import GraphEdgeType, ResourceGraph
 
 logger = logging.getLogger(__name__)

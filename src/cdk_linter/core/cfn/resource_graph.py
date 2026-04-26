@@ -1,8 +1,10 @@
 from __future__ import annotations
+
+import logging
 from dataclasses import dataclass, field
 from enum import Enum, auto
-import logging
 from typing import Any
+
 from cdk_linter.core.cfn.cfn_resource import CfnResource
 
 logger = logging.getLogger(__name__)

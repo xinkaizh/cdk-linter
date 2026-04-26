@@ -6,12 +6,12 @@ from pathlib import Path
 
 import fire
 
+import cdk_linter.rules as _rules_pkg
 from cdk_linter.core.diagnostic import Diagnostic
-from cdk_linter.rules.rule import BaseRule, CfnRule, TsRule
 from cdk_linter.core.ts.statement_tree import FileStatementTree
 from cdk_linter.parsers.cfn_parser import CfnParser
 from cdk_linter.parsers.ts_parser import parse_directory
-import cdk_linter.rules as _rules_pkg
+from cdk_linter.rules.rule import BaseRule, CfnRule, TsRule
 from cdk_linter.utils.visualize_graph import visualize
 
 logger = logging.getLogger(__name__)
