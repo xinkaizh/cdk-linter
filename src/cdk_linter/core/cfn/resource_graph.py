@@ -34,6 +34,7 @@ class GraphEdgeType(Enum):
     """Formally defines types of edges. Each type represents a different kind of relationship between two nodes."""
     ROLE_CONTAINS_POLICY = auto()  # src (IAM role) contains dst (IAM policy)
     LAMBDA_EXECUTION_ROLE = auto()  # src (Lambda) uses dst (IAM role) as execution role
+    POLICY_ALLOWs_ACTION = auto()  # src (IAM policy) allows actions on dst (any type)
 
 class ResourceGraph:
     """

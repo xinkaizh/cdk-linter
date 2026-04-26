@@ -9,6 +9,14 @@ from cdk_linter.core.cfn.resource_type import ResourceType
 
 logger = logging.getLogger(__name__)
 
+"""
+For simplicity, we currently don't support:
+
+- hardcoded ARN values
+- referencing parameter values
+- using "*" to demote all resources in IAM policy
+"""
+
 
 class CfnTemplateParser:
     def __init__(self) -> None:
@@ -51,9 +59,8 @@ class CfnTemplateParser:
             raise ValueError("no CFN template has been parsed yet")
         return self._resource_graph
 
-    def _handle_iam_policy(self, policy_resource: CfnResource):
+    def _handle_iam_policy(self, policy_resource: CfnResource):         
         roles = policy_resource.properties.get("Roles")
-
         if not roles:
             logger.warning(f"IAM Policy {policy_resource.id} isn't attached to any Roles")
 
@@ -68,7 +75,36 @@ class CfnTemplateParser:
             )
 
         # add policy -> allowed_resource edges:
-        # TODO
+        statements = policy_resource.properties["PolicyDocument"]["Statement"]
+        for statement in statements:
+            action: str | list[str] = statement["Action"]
+            effect: str = statement["Effect"]
+            resource: str | list | dict = statement["Resource"]
+
+            if isinstance(resource, str):
+                logger.warning(f"Ignored unsupported policy resource format: {resource}")
+                continue
+            if effect != "Allow":
+                logger.warning(f"Ignored unsupported policy effect: {effect}")
+                continue
+
+            # normalize action and resource
+            if isinstance(action, str):
+                action = [action]
+            if isinstance(resource, dict):
+                resource = [resource]
+
+            for res in resource:
+                if "Fn::GetAtt" not in res:
+                    logger.warning(f"Ignored unsupported way for resource reference {res}")
+                    continue
+                rid = res["Fn::GetAtt"][0]
+                self._resource_graph.connect_resources(
+                    source=policy_resource,
+                    destination=self._resource_index.get_resource_by_id(rid),
+                    type=GraphEdgeType.POLICY_ALLOWs_ACTION,
+                    metadata={"actions": action}
+                )
 
     def _handle_lambda_function(self, lambda_resource: CfnResource):
         def _extract_id(data: Any):
