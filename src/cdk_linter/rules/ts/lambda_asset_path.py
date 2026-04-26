@@ -2,8 +2,9 @@ import logging
 from pathlib import Path
 from typing import Iterator
 
-from cdk_linter.parsers.tsparser import Diagnostic, FileStatementTree, StatementTree
-from cdk_linter.rules import TSRule
+from cdk_linter.core.diagnostic import Diagnostic
+from cdk_linter.rules.rule import TsRule
+from cdk_linter.core.ts.statement_tree import FileStatementTree, StatementTree
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +33,7 @@ def _get_first_argument(node: StatementTree) -> StatementTree | None:
     if node.type != "call_expression":
         return None
 
-    arguments_node = next(
-        (child for child in node.children if child.type == "arguments"), None
-    )
+    arguments_node = next((child for child in node.children if child.type == "arguments"), None)
     if arguments_node is None:
         return None
 
@@ -44,9 +43,7 @@ def _get_first_argument(node: StatementTree) -> StatementTree | None:
     return None
 
 
-def _check_statement(
-    stmt: StatementTree, file: Path, violations: list[Diagnostic]
-) -> None:
+def _check_statement(stmt: StatementTree, file: Path, violations: list[Diagnostic]) -> None:
     for node in _walk_tree(stmt):
         if not _is_from_asset_call(node):
             continue
@@ -77,7 +74,7 @@ def _check_statement(
             )
 
 
-class LambdaAssetPath(TSRule):
+class LambdaAssetPath(TsRule):
     def check(self, files: list[FileStatementTree]) -> list[Diagnostic]:
         statement_count = sum(len(file_tree.statements) for file_tree in files)
         logger.debug(

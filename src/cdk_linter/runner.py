@@ -6,11 +6,20 @@ from pathlib import Path
 
 import fire
 
+from cdk_linter.core.diagnostic import Diagnostic
+from cdk_linter.rules.rule import BaseRule, CfnRule, TsRule
+from cdk_linter.core.ts.statement_tree import FileStatementTree
+from cdk_linter.parsers.cfn_parser import CfnParser
+from cdk_linter.parsers.ts_parser import parse_directory
 import cdk_linter.rules as _rules_pkg
-from cdk_linter.parsers.tsparser import Diagnostic, FileStatementTree, parse_directory
-from cdk_linter.rules import BaseRule, TSRule
+from cdk_linter.utils.visualize_graph import visualize
 
 logger = logging.getLogger(__name__)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s | %(module)s | %(message)s",
+)
 
 
 def placeholder_emit_as_lsp_diagnostic(file: Path, line: int, message: str) -> None:
@@ -31,8 +40,8 @@ def _discover_rules() -> list[BaseRule]:
             if (
                 issubclass(obj, BaseRule)
                 and obj is not BaseRule
-                and obj is not TSRule
-                # and obj is not CFNRule
+                and obj is not TsRule
+                and obj is not CfnRule
                 and obj.__module__ == module_name
             ):
                 logger.debug("Discovered rule: %s", obj.__name__)
@@ -40,21 +49,16 @@ def _discover_rules() -> list[BaseRule]:
     return rules
 
 
-def lint_ts(data_dir: str = "data", verbose: bool = False) -> None:
+def lint_ts(data_dir: str = "data/job_service", verbose: bool = False) -> None:
     """Lint all TypeScript CDK files under DATA_DIR.
 
     Args:
         data_dir: Root directory containing .ts CDK source files. Defaults to "data".
         verbose: Enable debug-level logging.
     """
-    logging.basicConfig(
-        level=logging.DEBUG if verbose else logging.INFO,
-        format="%(levelname)s %(name)s: %(message)s",
-    )
-
     logger.info("Starting TypeScript lint on %s", data_dir)
 
-    rules: list[TSRule] = [r for r in _discover_rules() if isinstance(r, TSRule)]
+    rules: list[TsRule] = [r for r in _discover_rules() if isinstance(r, TsRule)]
     logger.info("Running %d TS rule(s)", len(rules))
 
     parsed_files: list[FileStatementTree] = parse_directory(Path(data_dir))
@@ -64,9 +68,7 @@ def lint_ts(data_dir: str = "data", verbose: bool = False) -> None:
         try:
             diagnostics: list[Diagnostic] = rule.check(parsed_files)
         except Exception:
-            logger.error(
-                "Rule %s raised an exception", type(rule).__name__, exc_info=True
-            )
+            logger.error("Rule %s raised an exception", type(rule).__name__, exc_info=True)
             continue
         for diag in diagnostics:
             placeholder_emit_as_lsp_diagnostic(diag.file, diag.line, diag.message)
@@ -75,15 +77,39 @@ def lint_ts(data_dir: str = "data", verbose: bool = False) -> None:
     logger.info("Lint complete: %d diagnostic(s) emitted", total_diagnostics)
 
 
-def lint_cfn() -> None:
-    """Lint all CloudFormation templates."""
-    raise NotImplementedError("Not implemented yet")
+def lint_cfn(cdk_app_root: str = "data/job_service", stack_name: str = "SampleStack") -> None:
+    """Only supports linting a single stack for now"""
+    path = Path(cdk_app_root) / "cdk.out" / f"{stack_name}.template.json"
+    logger.info("Starting CloudFormation lint on %s", path)
+
+    rules: list[CfnRule] = [r for r in _discover_rules() if isinstance(r, CfnRule)]
+    logger.info("Running %d CFN rule(s)", len(rules))
+
+    parser = CfnParser()
+    parser.parse(path)
+    graph = parser.get_resource_graph()
+    index = parser.get_resource_index()
+
+    visualize(graph)
+
+    total_diagnostics = 0
+    for rule in rules:
+        try:
+            diagnostics: list[Diagnostic] = rule.check(graph, index)
+        except Exception:
+            logger.error("Rule %s raised an exception", type(rule).__name__, exc_info=True)
+            continue
+        for diag in diagnostics:
+            placeholder_emit_as_lsp_diagnostic(diag.file, diag.line, diag.message)
+        total_diagnostics += len(diagnostics)
+
+    logger.info("Lint complete: %d diagnostic(s) emitted", total_diagnostics)
 
 
 def run() -> None:
     """
     Main code entry point for CDK Linter.
-    Usage: `uv run linter`
+    Usage: `uv run linter ts` or `uv run linter cfn`
     """
     fire.Fire(
         {

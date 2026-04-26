@@ -1,5 +1,6 @@
 import json
 import logging
+from pathlib import Path
 from typing import Any
 
 from cdk_linter.core.cfn.cfn_resource import CfnResource
@@ -18,14 +19,14 @@ For simplicity, we currently don't support:
 """
 
 
-class CfnTemplateParser:
+class CfnParser:
     def __init__(self) -> None:
         self._resource_index = ResourceIndex()
         self._resource_graph = ResourceGraph()
         self._supported_types = {t.value for t in ResourceType}
 
-    def parse(self, path: str):
-        with open(path, 'r') as f:
+    def parse(self, path: str | Path):
+        with open(path, "r") as f:
             data = json.load(f)
         resources = data["Resources"]
 
@@ -59,7 +60,7 @@ class CfnTemplateParser:
             raise ValueError("no CFN template has been parsed yet")
         return self._resource_graph
 
-    def _handle_iam_policy(self, policy_resource: CfnResource):         
+    def _handle_iam_policy(self, policy_resource: CfnResource):
         roles = policy_resource.properties.get("Roles")
         if not roles:
             logger.warning(f"IAM Policy {policy_resource.id} isn't attached to any Roles")
@@ -71,7 +72,7 @@ class CfnTemplateParser:
             self._resource_graph.connect_resources(
                 source=role_resource,
                 destination=policy_resource,
-                type=GraphEdgeType.ROLE_CONTAINS_POLICY
+                type=GraphEdgeType.ROLE_CONTAINS_POLICY,
             )
 
         # add policy -> allowed_resource edges:
@@ -103,7 +104,7 @@ class CfnTemplateParser:
                     source=policy_resource,
                     destination=self._resource_index.get_resource_by_id(rid),
                     type=GraphEdgeType.POLICY_ALLOWs_ACTION,
-                    metadata={"actions": action}
+                    metadata={"actions": action},
                 )
 
     def _handle_lambda_function(self, lambda_resource: CfnResource):
@@ -119,12 +120,12 @@ class CfnTemplateParser:
                 raise NotImplementedError("Don't support referencing parameter for now")
             else:
                 raise NotImplementedError("Unknown way to specify execution role")
-        
+
         execution_role = lambda_resource.properties["Role"]
         role_id = _extract_id(execution_role)
         role_resource = self._resource_index.get_resource_by_id(role_id)
         self._resource_graph.connect_resources(
             source=lambda_resource,
             destination=role_resource,
-            type=GraphEdgeType.LAMBDA_EXECUTION_ROLE
-        )        
+            type=GraphEdgeType.LAMBDA_EXECUTION_ROLE,
+        )

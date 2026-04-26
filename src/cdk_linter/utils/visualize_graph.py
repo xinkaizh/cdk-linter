@@ -30,12 +30,12 @@ def visualize(graph: ResourceGraph) -> None:
 
     ordered_nodes = sorted(graph._all_nodes, key=lambda node: node.resource.id)
     ordered_edges = sorted(
-        (
-            edge
-            for node in ordered_nodes
-            for edge in node.outgoing_edges
+        (edge for node in ordered_nodes for edge in node.outgoing_edges),
+        key=lambda edge: (
+            edge.source.resource.id,
+            edge.destination.resource.id,
+            edge.type.name,
         ),
-        key=lambda edge: (edge.source.resource.id, edge.destination.resource.id, edge.type.name),
     )
 
     try:

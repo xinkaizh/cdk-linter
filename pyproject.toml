@@ -16,10 +16,15 @@ dependencies = [
 linter = "cdk_linter.runner:run"
 dev = "cdk_linter.dev:run"
 clean = "cdk_linter.dev:clean"
-tsparser = "cdk_linter.parsers.tsparser:main"
+tsparser = "cdk_linter.parsers.ts_parser:main"
 
 [tool.uv]
 package = true
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+extend-exclude = "data"
 
 [dependency-groups]
 dev = [

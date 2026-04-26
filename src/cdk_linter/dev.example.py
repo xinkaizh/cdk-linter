@@ -4,13 +4,14 @@ import shutil
 
 logging.basicConfig(
     level=logging.INFO,
-    format="%(levelname)s | %(name)s | %(message)s",
+    format="%(levelname)s | %(module)s | %(message)s",
 )
 
 """
 Example dev file. Please make a copy of this file and rename it to `dev.py`
 Git tracks this example file, but not your actual dev.py
 """
+
 
 def run():
     """

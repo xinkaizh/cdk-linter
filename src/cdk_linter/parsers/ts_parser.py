@@ -1,14 +1,15 @@
-from dataclasses import dataclass, field
 import logging
 import os.path
 from os import PathLike
 from pathlib import Path
-from typing import NamedTuple, Any
+from typing import Any
 import msgspec
 
 import fire
 from tree_sitter import Language, Node, Parser
 import tree_sitter_typescript as tstypescript
+
+from cdk_linter.core.ts.statement_tree import FileStatementTree, StatementTree
 
 logger = logging.getLogger(__name__)
 
@@ -52,27 +53,6 @@ EXCLUDED_DIR_NAMES: frozenset[str] = frozenset(
         "__pycache__",
     }
 )
-
-
-class Diagnostic(NamedTuple):
-    file: Path
-    line: int
-    message: str
-
-
-@dataclass
-class StatementTree:
-    type: str
-    start_line: int
-    end_line: int
-    snippet: str
-    children: list["StatementTree"] = field(default_factory=list)
-
-
-@dataclass
-class FileStatementTree:
-    file: Path
-    statements: list[StatementTree]
 
 
 def _decode_snippet(source: bytes, node: Node) -> str:
@@ -132,12 +112,8 @@ def parse_file(file: PathLike) -> FileStatementTree:
 def parse_directory(root: PathLike) -> list[FileStatementTree]:
     logger.info("Scanning %s for TypeScript files", root)
     root_path = Path(root)
-    ts_files = sorted(
-        file for file in root_path.rglob("*.ts") if _is_relevant_ts_file(file)
-    )
-    logger.debug(
-        "Found %d relevant .ts file(s): %s", len(ts_files), [str(f) for f in ts_files]
-    )
+    ts_files = sorted(file for file in root_path.rglob("*.ts") if _is_relevant_ts_file(file))
+    logger.debug("Found %d relevant .ts file(s): %s", len(ts_files), [str(f) for f in ts_files])
 
     parsed_files = [parse_file(ts_file) for ts_file in ts_files]
     total_statements = sum(len(parsed.statements) for parsed in parsed_files)

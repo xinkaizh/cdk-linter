@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class GraphNode:
     """Represents a node in resource graph"""
+
     resource: CfnResource
     outgoing_edges: list[GraphEdge] = field(default_factory=list)
 
@@ -21,6 +22,7 @@ class GraphNode:
 @dataclass
 class GraphEdge:
     """Base class for an edge"""
+
     source: GraphNode
     destination: GraphNode
     type: GraphEdgeType
@@ -31,10 +33,15 @@ class GraphEdge:
 
 
 class GraphEdgeType(Enum):
-    """Formally defines types of edges. Each type represents a different kind of relationship between two nodes."""
+    """
+    Formally defines types of edges.
+    Each type represents a different kind of relationship between two nodes.
+    """
+
     ROLE_CONTAINS_POLICY = auto()  # src (IAM role) contains dst (IAM policy)
     LAMBDA_EXECUTION_ROLE = auto()  # src (Lambda) uses dst (IAM role) as execution role
     POLICY_ALLOWs_ACTION = auto()  # src (IAM policy) allows actions on dst (any type)
+
 
 class ResourceGraph:
     """
@@ -69,7 +76,7 @@ class ResourceGraph:
         if edge.source not in self._all_nodes or edge.destination not in self._all_nodes:
             raise ValueError("Source or destination not exist in graph")
         edge.source.outgoing_edges.append(edge)
-    
+
     def add_resource(self, resource: CfnResource):
         """
         Add a CfnResource to the graph (a GraphNode will be created automatically).
@@ -77,7 +84,13 @@ class ResourceGraph:
         node = GraphNode(resource, [])
         self.add_node(node)
 
-    def connect_resources(self, source: CfnResource, destination: CfnResource, type: GraphEdgeType, metadata: dict[Any, Any] = {}):
+    def connect_resources(
+        self,
+        source: CfnResource,
+        destination: CfnResource,
+        type: GraphEdgeType,
+        metadata: dict[Any, Any] = {},
+    ):
         """
         Connect two CfnResources together (a GraphEdge will be created automatically).
         """
