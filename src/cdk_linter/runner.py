@@ -7,7 +7,7 @@ from pathlib import Path
 import fire
 
 import cdk_linter.rules as _rules_pkg
-from cdk_linter.core.diagnostic import Diagnostic
+from cdk_linter.core.diagnostic import Diagnostic, DiagnosticSeverity
 from cdk_linter.core.ts.statement_tree import FileStatementTree
 from cdk_linter.parsers.cfn_parser import CfnParser
 from cdk_linter.parsers.ts_parser import parse_directory
@@ -24,11 +24,25 @@ logging.getLogger("cdk_linter.parsers.cfn_parser").setLevel(logging.ERROR)
 logger = ColorAdapter(logging.getLogger(__name__), {})
 
 
-def placeholder_emit_as_lsp_diagnostic(file: Path, line: int, message: str) -> None:
+def placeholder_emit_as_lsp_diagnostic(
+    file: Path,
+    line: int,
+    message: str,
+    severity: DiagnosticSeverity = DiagnosticSeverity.ERROR,
+) -> None:
     # Placeholder for now. Ideally we'll send it out as a LSP message, but I
     # think that'll be the orchestrator's job
     locator = f"{file}:{line} " if file else ""
-    logger.error(f"{RED}{CROSS} {locator}{message}{RESET}")
+    formatted_message = f"{RED}{CROSS} [{severity.value}] {locator}{message}{RESET}"
+    # Route diagnostics through the matching logging level so the terminal
+    # output makes the severity visible even before reading the message.
+    match severity:
+        case DiagnosticSeverity.WARNING:
+            logger.warning(formatted_message)
+        case DiagnosticSeverity.CRITICAL:
+            logger.critical(formatted_message)
+        case DiagnosticSeverity.ERROR:
+            logger.error(formatted_message)
 
 
 def _discover_rules() -> list[BaseRule]:
@@ -76,7 +90,7 @@ def lint_ts(data_dir: str = "data/job_service", verbose: bool = False) -> None:
             logger.error("Rule %s raised an exception", type(rule).__name__, exc_info=True)
             continue
         for diag in diagnostics:
-            placeholder_emit_as_lsp_diagnostic(diag.file, diag.line, diag.message)
+            placeholder_emit_as_lsp_diagnostic(diag.file, diag.line, diag.message, diag.severity)
         total_diagnostics += len(diagnostics)
 
     if total_diagnostics == 0:
@@ -115,7 +129,7 @@ def lint_cfn(cdk_app_root: str = "data/job_service", stack_name: str = "SampleSt
             continue
 
         for diag in diagnostics:
-            placeholder_emit_as_lsp_diagnostic(diag.file, diag.line, diag.message)
+            placeholder_emit_as_lsp_diagnostic(diag.file, diag.line, diag.message, diag.severity)
 
         total_diagnostics += len(diagnostics)
 

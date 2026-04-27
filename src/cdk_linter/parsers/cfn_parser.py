@@ -15,7 +15,6 @@ For simplicity, we currently don't support:
 
 - hardcoded ARN values
 - referencing parameter values
-- using "*" to demote all resources in IAM policy
 """
 
 
@@ -39,6 +38,11 @@ class CfnParser:
             resource = CfnResource(id=id, type=type, properties=body["Properties"])
             self._resource_index.add(resource)
             self._resource_graph.add_resource(resource)
+        # Treat Resource: "*" as a real graph target so IAM rules can flag it
+        # instead of losing the statement during parsing.
+        wildcard_resource = CfnResource(id="*", type=ResourceType.ALL)
+        self._resource_index.add(wildcard_resource)
+        self._resource_graph.add_resource(wildcard_resource)
 
         # build up connections in dependency graph
         for res in self._resource_index.get_all_resources():
@@ -47,7 +51,13 @@ class CfnParser:
                     self._handle_iam_policy(res)
                 case ResourceType.LAMBDA:
                     self._handle_lambda_function(res)
-                case ResourceType.DDB | ResourceType.SQS | ResourceType.S3 | ResourceType.ROLE:
+                case (
+                    ResourceType.ALL
+                    | ResourceType.DDB
+                    | ResourceType.SQS
+                    | ResourceType.S3
+                    | ResourceType.ROLE
+                ):
                     pass  # no-op for now
 
     def get_resource_index(self) -> ResourceIndex:
@@ -82,9 +92,6 @@ class CfnParser:
             effect: str = statement["Effect"]
             resource: str | list | dict = statement["Resource"]
 
-            if isinstance(resource, str):
-                logger.warning(f"Ignored unsupported policy resource format: {resource}")
-                continue
             if effect != "Allow":
                 logger.warning(f"Ignored unsupported policy effect: {effect}")
                 continue
@@ -92,14 +99,26 @@ class CfnParser:
             # normalize action and resource
             if isinstance(action, str):
                 action = [action]
+            if isinstance(resource, str):
+                if resource != "*":
+                    logger.warning(f"Ignored unsupported policy resource format: {resource}")
+                    continue
+                # Keep the wildcard in the same reference-shaped flow as other
+                # resources so edge creation can stay simple below.
+                resource = [{"Ref": "*"}]
             if isinstance(resource, dict):
                 resource = [resource]
 
             for res in resource:
-                if "Fn::GetAtt" not in res:
+                if res == "*":
+                    rid = "*"
+                elif isinstance(res, dict) and "Fn::GetAtt" in res:
+                    rid = res["Fn::GetAtt"][0]
+                elif isinstance(res, dict) and res.get("Ref") == "*":
+                    rid = "*"
+                else:
                     logger.warning(f"Ignored unsupported way for resource reference {res}")
                     continue
-                rid = res["Fn::GetAtt"][0]
                 self._resource_graph.connect_resources(
                     source=policy_resource,
                     destination=self._resource_index.get_resource_by_id(rid),
