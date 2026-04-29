@@ -54,19 +54,36 @@ EXCLUDED_DIR_NAMES: frozenset[str] = frozenset(
     }
 )
 
+# Node types that should be flattened
+FLATTEN_NODE_TYPES: frozenset[str] = frozenset(
+    {
+        "variable_declarator",
+    }
+)
 
 def _decode_snippet(source: bytes, node: Node) -> str:
     return source[node.start_byte : node.end_byte].decode("utf-8", errors="replace")
 
 
+def _build_children(node: Node, source: bytes) -> list[StatementTree]:
+    children: list[StatementTree] = []
+
+    for child in node.named_children:
+        if child.type in FLATTEN_NODE_TYPES:
+            children.extend(_build_children(child, source))
+        else:
+            children.append(_build_statement_tree(child, source))
+
+    return children
+
+
 def _build_statement_tree(node: Node, source: bytes) -> StatementTree:
-    children = [_build_statement_tree(child, source) for child in node.named_children]
     return StatementTree(
         type=node.type,
         start_line=node.start_point.row + 1,
         end_line=node.end_point.row + 1,
         snippet=_decode_snippet(source, node),
-        children=children,
+        children=_build_children(node, source),
     )
 
 
