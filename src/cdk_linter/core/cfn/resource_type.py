@@ -12,3 +12,6 @@ class ResourceType(Enum):
     LAMBDA = "AWS::Lambda::Function"
     ROLE = "AWS::IAM::Role"
     POLICY = "AWS::IAM::Policy"
+    VPC = "AWS::EC2::VPC"
+    SUBNET = "AWS::EC2::Subnet"
+    EC2_INSTANCE = "AWS::EC2::Instance"

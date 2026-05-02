@@ -693,6 +693,16 @@
     "aws:cdk:path": "Ec2Stack/MyInstance/Resource"
    }
   },
+  "BadInstanceMissingVpcSubnet": {
+   "Type": "AWS::EC2::Instance",
+   "Properties": {
+    "ImageId": "ami-1234567890abcdef0",
+    "InstanceType": "t2.micro"
+   },
+   "Metadata": {
+    "aws:cdk:path": "Ec2Stack/BadInstanceMissingVpcSubnet/Resource"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {

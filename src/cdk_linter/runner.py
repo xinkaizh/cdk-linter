@@ -11,6 +11,7 @@ from cdk_linter.core.diagnostic import Diagnostic, DiagnosticSeverity
 from cdk_linter.core.ts.statement_tree import FileStatementTree
 from cdk_linter.parsers.cfn_parser import CfnParser
 from cdk_linter.parsers.ts_parser import parse_directory
+from cdk_linter.rules.cfn.ec2_vpc_rule import Ec2InstanceVpcRule
 from cdk_linter.rules.cfn.lambda_permission_rule import LambdaPermissionRule
 from cdk_linter.rules.rule import BaseRule, CfnRule, TsRule
 from cdk_linter.utils.pretty_logging import CHECK, CROSS, RED, RESET, ColorAdapter
@@ -66,6 +67,14 @@ def _discover_rules() -> list[BaseRule]:
     return rules
 
 
+def _discover_cfn_rules(rule_types: tuple[type[CfnRule], ...]) -> list[CfnRule]:
+    return [
+        rule
+        for rule in _discover_rules()
+        if isinstance(rule, CfnRule) and isinstance(rule, rule_types)
+    ]
+
+
 def lint_ts(data_dir: str = "data/job_service", verbose: bool = False) -> None:
     """Lint all TypeScript CDK files under DATA_DIR.
 
@@ -99,8 +108,7 @@ def lint_ts(data_dir: str = "data/job_service", verbose: bool = False) -> None:
         logger.info("Lint complete: %d diagnostic(s) emitted", total_diagnostics)
 
 
-def lint_cfn(cdk_app_root: str = "data/job_service", stack_name: str = "SampleStack") -> None:
-    """Only supports linting a single stack for now"""
+def _lint_cfn_stack(cdk_app_root: str, stack_name: str, rules: list[CfnRule]) -> int:
     path = Path(cdk_app_root) / "cdk.out" / f"{stack_name}.template.json"
     logger.info("Start linting CloudFormation template at %s", path)
 
@@ -112,7 +120,6 @@ def lint_cfn(cdk_app_root: str = "data/job_service", stack_name: str = "SampleSt
 
     visualize(graph)
 
-    rules: list[CfnRule] = [r for r in _discover_rules() if isinstance(r, CfnRule)]
     logger.info("Founds %d CFN rule(s)", len(rules))
 
     total_diagnostics = 0
@@ -121,7 +128,11 @@ def lint_cfn(cdk_app_root: str = "data/job_service", stack_name: str = "SampleSt
         try:
             # temporary solution for taking in a spec
             if isinstance(rule, LambdaPermissionRule):
-                rule.prime(Path(cdk_app_root) / "spec.txt")
+                spec_path = Path(cdk_app_root) / "spec.txt"
+                if not spec_path.exists():
+                    logger.info("Skipping %s because %s does not exist", type(rule).__name__, spec_path)
+                    continue
+                rule.prime(spec_path)
 
             diagnostics: list[Diagnostic] = rule.check(graph, index)
         except Exception:
@@ -133,20 +144,44 @@ def lint_cfn(cdk_app_root: str = "data/job_service", stack_name: str = "SampleSt
 
         total_diagnostics += len(diagnostics)
 
+    return total_diagnostics
+
+
+def _emit_lint_summary(total_diagnostics: int) -> None:
     if total_diagnostics == 0:
         logger.info(f"{CHECK} Lint complete: no issues found")
     else:
         logger.info("Lint complete: %d diagnostic(s) emitted", total_diagnostics)
 
 
+def lint_cfn() -> None:
+    """Lint each bundled CloudFormation sample with its responsible rule."""
+    iam_rules = _discover_cfn_rules((LambdaPermissionRule,))
+    ec2_rules = _discover_cfn_rules((Ec2InstanceVpcRule,))
+
+    total_diagnostics = 0
+    total_diagnostics += _lint_cfn_stack("data/job_service", "SampleStack", iam_rules)
+    total_diagnostics += _lint_cfn_stack("data/ec2_vpc", "Ec2Stack", ec2_rules)
+
+    _emit_lint_summary(total_diagnostics)
+
+
+def lint_ec2() -> None:
+    """Lint the bundled EC2/VPC sample stack."""
+    rules = _discover_cfn_rules((Ec2InstanceVpcRule,))
+    total_diagnostics = _lint_cfn_stack("data/ec2_vpc", "Ec2Stack", rules)
+    _emit_lint_summary(total_diagnostics)
+
+
 def run() -> None:
     """
     Main code entry point for CDK Linter.
-    Usage: `uv run linter ts` or `uv run linter cfn`
+    Usage: `uv run linter ts`, `uv run linter cfn`, or `uv run linter ec2`
     """
     fire.Fire(
         {
             "ts": lint_ts,
             "cfn": lint_cfn,
+            "ec2": lint_ec2,
         }
     )
