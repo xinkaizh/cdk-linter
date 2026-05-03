@@ -25,7 +25,23 @@ class CfnParser:
         self._resource_graph = ResourceGraph()
         self._supported_types = {t.value for t in ResourceType}
 
+    def parse_all(self, paths: list[str | Path]):
+        """
+        Parse multiple CloudFormation templates into ResourceGraph and ResourceIndex
+
+        Param:
+        - paths: list of CFN template paths (e.g., "StackName.template.json")
+        """
+        for path in paths:
+            self.parse(path)
+
     def parse(self, path: str | Path):
+        """
+        Parse a CloudFormation template into ResourceGraph and ResourceIndex
+
+        Param:
+        - path: path to the CFN template (e.g., "StackName.template.json")
+        """
         with open(path, "r") as f:
             data = json.load(f)
         resources = data["Resources"]
@@ -61,6 +77,7 @@ class CfnParser:
         return self._resource_graph
 
     def _handle_iam_policy(self, policy_resource: CfnResource):
+        """Parsing logic for IAM policies"""
         roles = policy_resource.properties.get("Roles")
         if not roles:
             logger.warning(f"IAM Policy {policy_resource.id} isn't attached to any Roles")
@@ -108,6 +125,7 @@ class CfnParser:
                 )
 
     def _handle_lambda_function(self, lambda_resource: CfnResource):
+        """Parsing logic for Lambda functions"""
         def _extract_id(data: Any):
             # hardcoded ARN - e.g., "arn:aws:iam::123456789012:role/MyRole"
             if isinstance(data, str):

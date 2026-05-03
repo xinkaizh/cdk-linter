@@ -1,0 +1,322 @@
+{
+ "Resources": {
+  "JobsTable1970BC16": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "job_id",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "job_id",
+      "KeyType": "HASH"
+     }
+    ],
+    "TableName": "cdk-playground-jobs"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "ResourceStack/JobsTable/Resource"
+   }
+  },
+  "RawBucket0C3EE094": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "ResourceStack/RawBucket/Resource"
+   }
+  },
+  "RawBucketPolicy61C50A52": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "RawBucket0C3EE094"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:PutBucketPolicy"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "RawBucket0C3EE094",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "RawBucket0C3EE094",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "ResourceStack/RawBucket/Policy/Resource"
+   }
+  },
+  "RawBucketAutoDeleteObjectsCustomResource4CB74628": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "RawBucket0C3EE094"
+    }
+   },
+   "DependsOn": [
+    "RawBucketPolicy61C50A52"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "ResourceStack/RawBucket/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "ResourceStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-west-2"
+     },
+     "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Lambda function for auto-deleting objects in ",
+       {
+        "Ref": "RawBucket0C3EE094"
+       },
+       " S3 bucket."
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "ResourceStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+    "aws:asset:property": "Code"
+   }
+  },
+  "JobsDlqB53173A1": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "MessageRetentionPeriod": 1209600,
+    "QueueName": "cdk-playground-jobs-dlq"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "ResourceStack/JobsDlq/Resource"
+   }
+  },
+  "JobsQueue86ED6666": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "QueueName": "cdk-playground-jobs-queue",
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "JobsDlqB53173A1",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 120
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "ResourceStack/JobsQueue/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/4VQy07DMBD8lu6xcg0ULvRGS0+8QloOqEKVEy/VtolN7XUgsvLvKEl5CIQ4zXpmPbs7Yzk+O5HHA/XqR7nejQrKZFywyndCvfp11LVRpdWZjEuVFbiKwC3eqhJhAkMQ8KIcE5M1V1jDJIL5krh+acsFNAIyKgoymxurWyq5eFwn83Sdzu8f5oslCHBY2koViS0or2ECGj07W0PzJGbPphveCH8q4zTkO+RVBBXYXmKBjHfZFnP2MGEX8D+r/r/ooe9ZRci6Z7f397Zeb4TfexnvA4Y2gX2L3xJwyGjaBBJ0ZPUn+8cW4rdDRZ4yKojrJZVoAx94jUpfIzO6bnYb774vOrlUbynmSBXObDCH7f+7v3NqGpGit8HluIIhPIlZ8GzLH9yz+SB+6ImzFWl0U+VRXHiPvGC1IbNphLEa5dYfVeNjeXIux4OtJxq5YJhKlGmP75jmOaB2AgAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "ResourceStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "ExportsOutputFnGetAttJobsTable1970BC16ArnC40C1624": {
+   "Value": {
+    "Fn::GetAtt": [
+     "JobsTable1970BC16",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "ResourceStack:ExportsOutputFnGetAttJobsTable1970BC16ArnC40C1624"
+   }
+  },
+  "ExportsOutputFnGetAttRawBucket0C3EE094ArnD2F95F99": {
+   "Value": {
+    "Fn::GetAtt": [
+     "RawBucket0C3EE094",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "ResourceStack:ExportsOutputFnGetAttRawBucket0C3EE094ArnD2F95F99"
+   }
+  },
+  "ExportsOutputFnGetAttJobsQueue86ED6666ArnE154B711": {
+   "Value": {
+    "Fn::GetAtt": [
+     "JobsQueue86ED6666",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "ResourceStack:ExportsOutputFnGetAttJobsQueue86ED6666ArnE154B711"
+   }
+  },
+  "ExportsOutputRefJobsTable1970BC16EDB4A824": {
+   "Value": {
+    "Ref": "JobsTable1970BC16"
+   },
+   "Export": {
+    "Name": "ResourceStack:ExportsOutputRefJobsTable1970BC16EDB4A824"
+   }
+  },
+  "ExportsOutputRefRawBucket0C3EE094D6333DF9": {
+   "Value": {
+    "Ref": "RawBucket0C3EE094"
+   },
+   "Export": {
+    "Name": "ResourceStack:ExportsOutputRefRawBucket0C3EE094D6333DF9"
+   }
+  },
+  "ExportsOutputRefJobsQueue86ED6666E80AB877": {
+   "Value": {
+    "Ref": "JobsQueue86ED6666"
+   },
+   "Export": {
+    "Name": "ResourceStack:ExportsOutputRefJobsQueue86ED6666E80AB877"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

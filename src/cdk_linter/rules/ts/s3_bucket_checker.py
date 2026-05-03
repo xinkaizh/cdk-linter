@@ -2,8 +2,9 @@ import logging
 from pathlib import Path
 from typing import Iterator
 
-from cdk_linter.parsers.tsparser import Diagnostic, FileStatementTree, StatementTree
-from cdk_linter.rules import TSRule
+from cdk_linter.core.diagnostic import Diagnostic
+from cdk_linter.core.ts.statement_tree import FileStatementTree, StatementTree
+from cdk_linter.rules.rule import TsRule
 
 logger = logging.getLogger(__name__)
 
@@ -159,7 +160,9 @@ def _check_statement(
             )
 
 
-class S3BucketName(TSRule):
+class S3BucketNameRule(TsRule):
+    description = "Checks if S3 bucket names are valid in format"
+
     def check(self, files: list[FileStatementTree]) -> list[Diagnostic]:
         logger.debug(
             "Checking %d file(s) for S3 bucket name issues",

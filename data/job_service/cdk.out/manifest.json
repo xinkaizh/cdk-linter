@@ -1,28 +1,28 @@
 {
   "version": "52.0.0",
   "artifacts": {
-    "SampleStack.assets": {
+    "FullStack.assets": {
       "type": "cdk:asset-manifest",
       "properties": {
-        "file": "SampleStack.assets.json",
+        "file": "FullStack.assets.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
       }
     },
-    "SampleStack": {
+    "FullStack": {
       "type": "aws:cloudformation:stack",
       "environment": "aws://unknown-account/us-west-2",
       "properties": {
-        "templateFile": "SampleStack.template.json",
+        "templateFile": "FullStack.template.json",
         "terminationProtection": false,
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-us-west-2",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-us-west-2",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-us-west-2/cf1b3084b8edf8a1123d93afbfe6994aea495a9674bd4038ef482d0f00a56596.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-us-west-2/159f652aa19828eccebb24f0470d5fdde2da9d867d465c40906c7ff0106aee93.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
-          "SampleStack.assets"
+          "FullStack.assets"
         ],
         "lookupRole": {
           "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-us-west-2",
@@ -31,10 +31,10 @@
         }
       },
       "dependencies": [
-        "SampleStack.assets"
+        "FullStack.assets"
       ],
       "metadata": {
-        "/SampleStack/JobsTable": [
+        "/FullStack/JobsTable": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -54,19 +54,19 @@
             }
           }
         ],
-        "/SampleStack/JobsTable/Resource": [
+        "/FullStack/JobsTable/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsTable1970BC16"
           }
         ],
-        "/SampleStack/JobsTable/ScalingRole": [
+        "/FullStack/JobsTable/ScalingRole": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": "*"
           }
         ],
-        "/SampleStack/RawBucket": [
+        "/FullStack/RawBucket": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -75,13 +75,13 @@
             }
           }
         ],
-        "/SampleStack/RawBucket/Resource": [
+        "/FullStack/RawBucket/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "RawBucket0C3EE094"
           }
         ],
-        "/SampleStack/RawBucket/Policy": [
+        "/FullStack/RawBucket/Policy": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -89,43 +89,43 @@
             }
           }
         ],
-        "/SampleStack/RawBucket/Policy/Resource": [
+        "/FullStack/RawBucket/Policy/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "RawBucketPolicy61C50A52"
           }
         ],
-        "/SampleStack/RawBucket/AutoDeleteObjectsCustomResource": [
+        "/FullStack/RawBucket/AutoDeleteObjectsCustomResource": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": "*"
           }
         ],
-        "/SampleStack/RawBucket/AutoDeleteObjectsCustomResource/Default": [
+        "/FullStack/RawBucket/AutoDeleteObjectsCustomResource/Default": [
           {
             "type": "aws:cdk:logicalId",
             "data": "RawBucketAutoDeleteObjectsCustomResource4CB74628"
           }
         ],
-        "/SampleStack/Custom::S3AutoDeleteObjectsCustomResourceProvider": [
+        "/FullStack/Custom::S3AutoDeleteObjectsCustomResourceProvider": [
           {
             "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
             "data": true
           }
         ],
-        "/SampleStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+        "/FullStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
           }
         ],
-        "/SampleStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+        "/FullStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
           }
         ],
-        "/SampleStack/JobsDlq": [
+        "/FullStack/JobsDlq": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -135,13 +135,13 @@
             }
           }
         ],
-        "/SampleStack/JobsDlq/Resource": [
+        "/FullStack/JobsDlq/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsDlqB53173A1"
           }
         ],
-        "/SampleStack/JobsQueue": [
+        "/FullStack/JobsQueue": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -155,13 +155,13 @@
             }
           }
         ],
-        "/SampleStack/JobsQueue/Resource": [
+        "/FullStack/JobsQueue/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsQueue86ED6666"
           }
         ],
-        "/SampleStack/ApiHandler": [
+        "/FullStack/ApiHandler": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -203,7 +203,7 @@
             }
           }
         ],
-        "/SampleStack/ApiHandler/ServiceRole": [
+        "/FullStack/ApiHandler/ServiceRole": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -267,13 +267,13 @@
             }
           }
         ],
-        "/SampleStack/ApiHandler/ServiceRole/Resource": [
+        "/FullStack/ApiHandler/ServiceRole/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "ApiHandlerServiceRole592E70E9"
           }
         ],
-        "/SampleStack/ApiHandler/ServiceRole/DefaultPolicy": [
+        "/FullStack/ApiHandler/ServiceRole/DefaultPolicy": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": "*"
@@ -327,25 +327,25 @@
             }
           }
         ],
-        "/SampleStack/ApiHandler/ServiceRole/DefaultPolicy/Resource": [
+        "/FullStack/ApiHandler/ServiceRole/DefaultPolicy/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "ApiHandlerServiceRoleDefaultPolicy10321D87"
           }
         ],
-        "/SampleStack/ApiHandler/Resource": [
+        "/FullStack/ApiHandler/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "ApiHandler5E7490E8"
           }
         ],
-        "/SampleStack/ApiHandler/LogRetention/Resource": [
+        "/FullStack/ApiHandler/LogRetention/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "ApiHandlerLogRetention907E318F"
           }
         ],
-        "/SampleStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole": [
+        "/FullStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -385,13 +385,13 @@
             }
           }
         ],
-        "/SampleStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource": [
+        "/FullStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
           }
         ],
-        "/SampleStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy": [
+        "/FullStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": "*"
@@ -421,19 +421,19 @@
             }
           }
         ],
-        "/SampleStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource": [
+        "/FullStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB"
           }
         ],
-        "/SampleStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource": [
+        "/FullStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A"
           }
         ],
-        "/SampleStack/WorkerHandler": [
+        "/FullStack/WorkerHandler": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -466,7 +466,7 @@
             }
           }
         ],
-        "/SampleStack/WorkerHandler/ServiceRole": [
+        "/FullStack/WorkerHandler/ServiceRole": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -530,13 +530,13 @@
             }
           }
         ],
-        "/SampleStack/WorkerHandler/ServiceRole/Resource": [
+        "/FullStack/WorkerHandler/ServiceRole/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "WorkerHandlerServiceRole44E72B52"
           }
         ],
-        "/SampleStack/WorkerHandler/ServiceRole/DefaultPolicy": [
+        "/FullStack/WorkerHandler/ServiceRole/DefaultPolicy": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": "*"
@@ -590,25 +590,25 @@
             }
           }
         ],
-        "/SampleStack/WorkerHandler/ServiceRole/DefaultPolicy/Resource": [
+        "/FullStack/WorkerHandler/ServiceRole/DefaultPolicy/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "WorkerHandlerServiceRoleDefaultPolicyF84F1411"
           }
         ],
-        "/SampleStack/WorkerHandler/Resource": [
+        "/FullStack/WorkerHandler/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "WorkerHandlerCD1D8137"
           }
         ],
-        "/SampleStack/WorkerHandler/LogRetention/Resource": [
+        "/FullStack/WorkerHandler/LogRetention/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "WorkerHandlerLogRetention62F65CBC"
           }
         ],
-        "/SampleStack/WorkerHandler/SqsEventSource:SampleStackJobsQueueD427D2EF": [
+        "/FullStack/WorkerHandler/SqsEventSource:FullStackJobsQueueB7EDD0A8": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -625,13 +625,13 @@
             }
           }
         ],
-        "/SampleStack/WorkerHandler/SqsEventSource:SampleStackJobsQueueD427D2EF/Resource": [
+        "/FullStack/WorkerHandler/SqsEventSource:FullStackJobsQueueB7EDD0A8/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "WorkerHandlerSqsEventSourceSampleStackJobsQueueD427D2EF36DA865C"
+            "data": "WorkerHandlerSqsEventSourceFullStackJobsQueueB7EDD0A8C5AF2397"
           }
         ],
-        "/SampleStack/JobsApi": [
+        "/FullStack/JobsApi": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -647,13 +647,13 @@
             }
           }
         ],
-        "/SampleStack/JobsApi/Resource": [
+        "/FullStack/JobsApi/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsApiFE3EF639"
           }
         ],
-        "/SampleStack/JobsApi/Deployment": [
+        "/FullStack/JobsApi/Deployment": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -719,13 +719,13 @@
             }
           }
         ],
-        "/SampleStack/JobsApi/Deployment/Resource": [
+        "/FullStack/JobsApi/Deployment/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "JobsApiDeployment652DAB98ce35efe4d55872481ea3d5e624f37f28"
+            "data": "JobsApiDeployment652DAB98d027be65cde3b3373d9655c59aaeffba"
           }
         ],
-        "/SampleStack/JobsApi/DeploymentStage.prod": [
+        "/FullStack/JobsApi/DeploymentStage.prod": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -734,25 +734,25 @@
             }
           }
         ],
-        "/SampleStack/JobsApi/DeploymentStage.prod/Resource": [
+        "/FullStack/JobsApi/DeploymentStage.prod/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsApiDeploymentStageprod2FAA6CB6"
           }
         ],
-        "/SampleStack/JobsApi/Endpoint": [
+        "/FullStack/JobsApi/Endpoint": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsApiEndpoint688FA854"
           }
         ],
-        "/SampleStack/JobsApi/Default": [
+        "/FullStack/JobsApi/Default": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": "*"
           }
         ],
-        "/SampleStack/JobsApi/Default/OPTIONS": [
+        "/FullStack/JobsApi/Default/OPTIONS": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -787,13 +787,13 @@
             }
           }
         ],
-        "/SampleStack/JobsApi/Default/OPTIONS/Resource": [
+        "/FullStack/JobsApi/Default/OPTIONS/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsApiOPTIONSFC70B70F"
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs": [
+        "/FullStack/JobsApi/Default/jobs": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -802,13 +802,13 @@
             }
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/Resource": [
+        "/FullStack/JobsApi/Default/jobs/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsApijobs71BD8C69"
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/OPTIONS": [
+        "/FullStack/JobsApi/Default/jobs/OPTIONS": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -843,13 +843,13 @@
             }
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/OPTIONS/Resource": [
+        "/FullStack/JobsApi/Default/jobs/OPTIONS/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsApijobsOPTIONS21D77CB1"
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/POST": [
+        "/FullStack/JobsApi/Default/jobs/POST": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -860,25 +860,25 @@
             }
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/POST/ApiPermission.SampleStackJobsApi7575E245.POST..jobs": [
+        "/FullStack/JobsApi/Default/jobs/POST/ApiPermission.FullStackJobsApi1655EF40.POST..jobs": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "JobsApijobsPOSTApiPermissionSampleStackJobsApi7575E245POSTjobsDF0D8BEE"
+            "data": "JobsApijobsPOSTApiPermissionFullStackJobsApi1655EF40POSTjobsAEC03617"
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/POST/ApiPermission.Test.SampleStackJobsApi7575E245.POST..jobs": [
+        "/FullStack/JobsApi/Default/jobs/POST/ApiPermission.Test.FullStackJobsApi1655EF40.POST..jobs": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "JobsApijobsPOSTApiPermissionTestSampleStackJobsApi7575E245POSTjobsA263B0FE"
+            "data": "JobsApijobsPOSTApiPermissionTestFullStackJobsApi1655EF40POSTjobsE1F02227"
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/POST/Resource": [
+        "/FullStack/JobsApi/Default/jobs/POST/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsApijobsPOST6D297CE3"
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/{job_id}": [
+        "/FullStack/JobsApi/Default/jobs/{job_id}": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -887,13 +887,13 @@
             }
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/{job_id}/Resource": [
+        "/FullStack/JobsApi/Default/jobs/{job_id}/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsApijobsjobid806B6F67"
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/{job_id}/OPTIONS": [
+        "/FullStack/JobsApi/Default/jobs/{job_id}/OPTIONS": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -928,13 +928,13 @@
             }
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/{job_id}/OPTIONS/Resource": [
+        "/FullStack/JobsApi/Default/jobs/{job_id}/OPTIONS/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsApijobsjobidOPTIONSC7EA1D54"
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/{job_id}/GET": [
+        "/FullStack/JobsApi/Default/jobs/{job_id}/GET": [
           {
             "type": "aws:cdk:analytics:construct",
             "data": {
@@ -945,86 +945,1987 @@
             }
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/{job_id}/GET/ApiPermission.SampleStackJobsApi7575E245.GET..jobs.{job_id}": [
+        "/FullStack/JobsApi/Default/jobs/{job_id}/GET/ApiPermission.FullStackJobsApi1655EF40.GET..jobs.{job_id}": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "JobsApijobsjobidGETApiPermissionSampleStackJobsApi7575E245GETjobsjobidA7CC3E68"
+            "data": "JobsApijobsjobidGETApiPermissionFullStackJobsApi1655EF40GETjobsjobidCE5C1798"
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/{job_id}/GET/ApiPermission.Test.SampleStackJobsApi7575E245.GET..jobs.{job_id}": [
+        "/FullStack/JobsApi/Default/jobs/{job_id}/GET/ApiPermission.Test.FullStackJobsApi1655EF40.GET..jobs.{job_id}": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "JobsApijobsjobidGETApiPermissionTestSampleStackJobsApi7575E245GETjobsjobid0A8E9F78"
+            "data": "JobsApijobsjobidGETApiPermissionTestFullStackJobsApi1655EF40GETjobsjobid88EA97D8"
           }
         ],
-        "/SampleStack/JobsApi/Default/jobs/{job_id}/GET/Resource": [
+        "/FullStack/JobsApi/Default/jobs/{job_id}/GET/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsApijobsjobidGET8986E4E9"
           }
         ],
-        "/SampleStack/ApiBaseUrl": [
+        "/FullStack/ApiBaseUrl": [
           {
             "type": "aws:cdk:logicalId",
             "data": "ApiBaseUrl"
           }
         ],
-        "/SampleStack/CreateJobEndpoint": [
+        "/FullStack/CreateJobEndpoint": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CreateJobEndpoint"
           }
         ],
-        "/SampleStack/GetJobEndpointTemplate": [
+        "/FullStack/GetJobEndpointTemplate": [
           {
             "type": "aws:cdk:logicalId",
             "data": "GetJobEndpointTemplate"
           }
         ],
-        "/SampleStack/JobsTableName": [
+        "/FullStack/JobsTableName": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsTableName"
           }
         ],
-        "/SampleStack/RawBucketName": [
+        "/FullStack/RawBucketName": [
           {
             "type": "aws:cdk:logicalId",
             "data": "RawBucketName"
           }
         ],
-        "/SampleStack/JobsQueueName": [
+        "/FullStack/JobsQueueName": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsQueueName"
           }
         ],
-        "/SampleStack/JobsQueueUrl": [
+        "/FullStack/JobsQueueUrl": [
           {
             "type": "aws:cdk:logicalId",
             "data": "JobsQueueUrl"
           }
         ],
-        "/SampleStack/CDKMetadata/Default": [
+        "/FullStack/CDKMetadata/Default": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CDKMetadata"
           }
         ],
-        "/SampleStack/BootstrapVersion": [
+        "/FullStack/BootstrapVersion": [
           {
             "type": "aws:cdk:logicalId",
             "data": "BootstrapVersion"
           }
         ],
-        "/SampleStack/CheckBootstrapVersion": [
+        "/FullStack/CheckBootstrapVersion": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CheckBootstrapVersion"
           }
         ]
       },
-      "displayName": "SampleStack"
+      "displayName": "FullStack"
+    },
+    "MissingPermissionStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "MissingPermissionStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "MissingPermissionStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/us-west-2",
+      "properties": {
+        "templateFile": "MissingPermissionStack.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-us-west-2",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-us-west-2",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-us-west-2/c547fa357122f9a3fa06527d6c29cf8499d53e95f47446c5d6a3057754742a62.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "MissingPermissionStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-us-west-2",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "MissingPermissionStack.assets"
+      ],
+      "metadata": {
+        "/MissingPermissionStack/JobsTable": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "tableName": "*",
+              "partitionKey": {
+                "name": "*",
+                "type": "S"
+              },
+              "billingMode": "PAY_PER_REQUEST",
+              "removalPolicy": "destroy"
+            }
+          },
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "JobsTable1970BC16"
+            }
+          }
+        ],
+        "/MissingPermissionStack/JobsTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsTable1970BC16"
+          }
+        ],
+        "/MissingPermissionStack/JobsTable/ScalingRole": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": "*"
+          }
+        ],
+        "/MissingPermissionStack/RawBucket": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "autoDeleteObjects": true,
+              "removalPolicy": "destroy"
+            }
+          }
+        ],
+        "/MissingPermissionStack/RawBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RawBucket0C3EE094"
+          }
+        ],
+        "/MissingPermissionStack/RawBucket/Policy": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "bucket": "*"
+            }
+          }
+        ],
+        "/MissingPermissionStack/RawBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RawBucketPolicy61C50A52"
+          }
+        ],
+        "/MissingPermissionStack/RawBucket/AutoDeleteObjectsCustomResource": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": "*"
+          }
+        ],
+        "/MissingPermissionStack/RawBucket/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RawBucketAutoDeleteObjectsCustomResource4CB74628"
+          }
+        ],
+        "/MissingPermissionStack/Custom::S3AutoDeleteObjectsCustomResourceProvider": [
+          {
+            "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
+            "data": true
+          }
+        ],
+        "/MissingPermissionStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+          }
+        ],
+        "/MissingPermissionStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+          }
+        ],
+        "/MissingPermissionStack/JobsDlq": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "queueName": "*",
+              "retentionPeriod": "*",
+              "removalPolicy": "destroy"
+            }
+          }
+        ],
+        "/MissingPermissionStack/JobsDlq/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsDlqB53173A1"
+          }
+        ],
+        "/MissingPermissionStack/JobsQueue": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "queueName": "*",
+              "visibilityTimeout": "*",
+              "deadLetterQueue": {
+                "queue": "*",
+                "maxReceiveCount": "*"
+              },
+              "removalPolicy": "destroy"
+            }
+          }
+        ],
+        "/MissingPermissionStack/JobsQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsQueue86ED6666"
+          }
+        ],
+        "/MissingPermissionStack/ApiHandler": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "functionName": "*",
+              "runtime": "*",
+              "handler": "*",
+              "code": "*",
+              "timeout": "*",
+              "memorySize": "*",
+              "logRetention": 7,
+              "environment": "*"
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addEnvironment": [
+                "*",
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addEnvironment": [
+                "*",
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addEnvironment": [
+                "*",
+                "*"
+              ]
+            }
+          }
+        ],
+        "/MissingPermissionStack/ApiHandler/ServiceRole": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "assumedBy": {
+                "principalAccount": "*",
+                "assumeRoleAction": "*"
+              },
+              "managedPolicies": [
+                {
+                  "managedPolicyArn": "*"
+                }
+              ]
+            }
+          }
+        ],
+        "/MissingPermissionStack/ApiHandler/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiHandlerServiceRole592E70E9"
+          }
+        ],
+        "/MissingPermissionStack/ApiHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiHandler5E7490E8"
+          }
+        ],
+        "/MissingPermissionStack/ApiHandler/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiHandlerLogRetention907E318F"
+          }
+        ],
+        "/MissingPermissionStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "assumedBy": {
+                "principalAccount": "*",
+                "assumeRoleAction": "*"
+              },
+              "managedPolicies": [
+                {
+                  "managedPolicyArn": "*"
+                }
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToPrincipalPolicy": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachInlinePolicy": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachInlinePolicy": [
+                "*"
+              ]
+            }
+          }
+        ],
+        "/MissingPermissionStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+          }
+        ],
+        "/MissingPermissionStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": "*"
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachToRole": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachToRole": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addStatements": [
+                {}
+              ]
+            }
+          }
+        ],
+        "/MissingPermissionStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB"
+          }
+        ],
+        "/MissingPermissionStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A"
+          }
+        ],
+        "/MissingPermissionStack/WorkerHandler": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "functionName": "*",
+              "runtime": "*",
+              "handler": "*",
+              "code": "*",
+              "timeout": "*",
+              "memorySize": "*",
+              "logRetention": 7,
+              "environment": "*"
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addEnvironment": [
+                "*",
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addEnvironment": [
+                "*",
+                "*"
+              ]
+            }
+          }
+        ],
+        "/MissingPermissionStack/WorkerHandler/ServiceRole": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "assumedBy": {
+                "principalAccount": "*",
+                "assumeRoleAction": "*"
+              },
+              "managedPolicies": [
+                {
+                  "managedPolicyArn": "*"
+                }
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToPrincipalPolicy": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachInlinePolicy": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachInlinePolicy": [
+                "*"
+              ]
+            }
+          }
+        ],
+        "/MissingPermissionStack/WorkerHandler/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WorkerHandlerServiceRole44E72B52"
+          }
+        ],
+        "/MissingPermissionStack/WorkerHandler/ServiceRole/DefaultPolicy": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": "*"
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachToRole": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachToRole": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addStatements": [
+                {}
+              ]
+            }
+          }
+        ],
+        "/MissingPermissionStack/WorkerHandler/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WorkerHandlerServiceRoleDefaultPolicyF84F1411"
+          }
+        ],
+        "/MissingPermissionStack/WorkerHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WorkerHandlerCD1D8137"
+          }
+        ],
+        "/MissingPermissionStack/WorkerHandler/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WorkerHandlerLogRetention62F65CBC"
+          }
+        ],
+        "/MissingPermissionStack/WorkerHandler/SqsEventSource:MissingPermissionStackJobsQueue5E28430C": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "target": "*",
+              "batchSize": "*",
+              "maxBatchingWindow": "*",
+              "maxConcurrency": "*",
+              "reportBatchItemFailures": "*",
+              "enabled": "*",
+              "eventSourceArn": "*",
+              "filters": "*",
+              "filterEncryption": "*",
+              "metricsConfig": "*"
+            }
+          }
+        ],
+        "/MissingPermissionStack/WorkerHandler/SqsEventSource:MissingPermissionStackJobsQueue5E28430C/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WorkerHandlerSqsEventSourceMissingPermissionStackJobsQueue5E28430C77B8FC2E"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "restApiName": "*",
+              "deployOptions": {
+                "stageName": "*"
+              },
+              "defaultCorsPreflightOptions": {
+                "allowOrigins": "*",
+                "allowMethods": "*",
+                "allowHeaders": "*"
+              }
+            }
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApiFE3EF639"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Deployment": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "description": "*",
+              "api": "*",
+              "retainDeployments": "*"
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToLogicalId": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToLogicalId": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToLogicalId": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToLogicalId": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToLogicalId": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToLogicalId": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToLogicalId": [
+                {}
+              ]
+            }
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApiDeployment652DAB9848aa36f1d64bf3e4637197e58f244a3a"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/DeploymentStage.prod": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "deployment": "*",
+              "stageName": "*"
+            }
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/DeploymentStage.prod/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApiDeploymentStageprod2FAA6CB6"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApiEndpoint688FA854"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": "*"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/OPTIONS": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "resource": "*",
+              "httpMethod": "*",
+              "integration": "*",
+              "options": {
+                "authorizer": {
+                  "authorizerId": "*",
+                  "authorizationType": "*"
+                },
+                "apiKeyRequired": false,
+                "authorizationType": "*",
+                "methodResponses": [
+                  {
+                    "statusCode": "*",
+                    "responseParameters": "*"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addMethodResponse": [
+                {
+                  "statusCode": "*",
+                  "responseParameters": "*"
+                }
+              ]
+            }
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApiOPTIONSFC70B70F"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "parent": "*",
+              "pathPart": "*"
+            }
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobs71BD8C69"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/OPTIONS": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "resource": "*",
+              "httpMethod": "*",
+              "integration": "*",
+              "options": {
+                "authorizer": {
+                  "authorizerId": "*",
+                  "authorizationType": "*"
+                },
+                "apiKeyRequired": false,
+                "authorizationType": "*",
+                "methodResponses": [
+                  {
+                    "statusCode": "*",
+                    "responseParameters": "*"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addMethodResponse": [
+                {
+                  "statusCode": "*",
+                  "responseParameters": "*"
+                }
+              ]
+            }
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsOPTIONS21D77CB1"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/POST": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "resource": "*",
+              "httpMethod": "*",
+              "integration": "*",
+              "options": "*"
+            }
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/POST/ApiPermission.MissingPermissionStackJobsApi992CBEB4.POST..jobs": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsPOSTApiPermissionMissingPermissionStackJobsApi992CBEB4POSTjobsD4BC222D"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/POST/ApiPermission.Test.MissingPermissionStackJobsApi992CBEB4.POST..jobs": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsPOSTApiPermissionTestMissingPermissionStackJobsApi992CBEB4POSTjobs24650EC5"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsPOST6D297CE3"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/{job_id}": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "parent": "*",
+              "pathPart": "*"
+            }
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/{job_id}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsjobid806B6F67"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/{job_id}/OPTIONS": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "resource": "*",
+              "httpMethod": "*",
+              "integration": "*",
+              "options": {
+                "authorizer": {
+                  "authorizerId": "*",
+                  "authorizationType": "*"
+                },
+                "apiKeyRequired": false,
+                "authorizationType": "*",
+                "methodResponses": [
+                  {
+                    "statusCode": "*",
+                    "responseParameters": "*"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addMethodResponse": [
+                {
+                  "statusCode": "*",
+                  "responseParameters": "*"
+                }
+              ]
+            }
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/{job_id}/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsjobidOPTIONSC7EA1D54"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/{job_id}/GET": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "resource": "*",
+              "httpMethod": "*",
+              "integration": "*",
+              "options": "*"
+            }
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/{job_id}/GET/ApiPermission.MissingPermissionStackJobsApi992CBEB4.GET..jobs.{job_id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsjobidGETApiPermissionMissingPermissionStackJobsApi992CBEB4GETjobsjobidA8414E7B"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/{job_id}/GET/ApiPermission.Test.MissingPermissionStackJobsApi992CBEB4.GET..jobs.{job_id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsjobidGETApiPermissionTestMissingPermissionStackJobsApi992CBEB4GETjobsjobidB79244EA"
+          }
+        ],
+        "/MissingPermissionStack/JobsApi/Default/jobs/{job_id}/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsjobidGET8986E4E9"
+          }
+        ],
+        "/MissingPermissionStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/MissingPermissionStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/MissingPermissionStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "MissingPermissionStack"
+    },
+    "ResourceStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "ResourceStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "ResourceStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/us-west-2",
+      "properties": {
+        "templateFile": "ResourceStack.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-us-west-2",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-us-west-2",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-us-west-2/2c891ea3803d997a44d541f0e519bce256f7b4ea8b9993bca3c2dfd6e33827b0.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "ResourceStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-us-west-2",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "ResourceStack.assets"
+      ],
+      "metadata": {
+        "/ResourceStack/JobsTable": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "tableName": "*",
+              "partitionKey": {
+                "name": "*",
+                "type": "S"
+              },
+              "billingMode": "PAY_PER_REQUEST",
+              "removalPolicy": "destroy"
+            }
+          },
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "JobsTable1970BC16"
+            }
+          }
+        ],
+        "/ResourceStack/JobsTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsTable1970BC16"
+          }
+        ],
+        "/ResourceStack/JobsTable/ScalingRole": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": "*"
+          }
+        ],
+        "/ResourceStack/RawBucket": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "autoDeleteObjects": true,
+              "removalPolicy": "destroy"
+            }
+          }
+        ],
+        "/ResourceStack/RawBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RawBucket0C3EE094"
+          }
+        ],
+        "/ResourceStack/RawBucket/Policy": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "bucket": "*"
+            }
+          }
+        ],
+        "/ResourceStack/RawBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RawBucketPolicy61C50A52"
+          }
+        ],
+        "/ResourceStack/RawBucket/AutoDeleteObjectsCustomResource": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": "*"
+          }
+        ],
+        "/ResourceStack/RawBucket/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RawBucketAutoDeleteObjectsCustomResource4CB74628"
+          }
+        ],
+        "/ResourceStack/Custom::S3AutoDeleteObjectsCustomResourceProvider": [
+          {
+            "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
+            "data": true
+          }
+        ],
+        "/ResourceStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+          }
+        ],
+        "/ResourceStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+          }
+        ],
+        "/ResourceStack/JobsDlq": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "queueName": "*",
+              "retentionPeriod": "*",
+              "removalPolicy": "destroy"
+            }
+          }
+        ],
+        "/ResourceStack/JobsDlq/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsDlqB53173A1"
+          }
+        ],
+        "/ResourceStack/JobsQueue": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "queueName": "*",
+              "visibilityTimeout": "*",
+              "deadLetterQueue": {
+                "queue": "*",
+                "maxReceiveCount": "*"
+              },
+              "removalPolicy": "destroy"
+            }
+          }
+        ],
+        "/ResourceStack/JobsQueue/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsQueue86ED6666"
+          }
+        ],
+        "/ResourceStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/ResourceStack/Exports/Output{\"Fn::GetAtt\":[\"JobsTable1970BC16\",\"Arn\"]}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputFnGetAttJobsTable1970BC16ArnC40C1624"
+          }
+        ],
+        "/ResourceStack/Exports/Output{\"Fn::GetAtt\":[\"RawBucket0C3EE094\",\"Arn\"]}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputFnGetAttRawBucket0C3EE094ArnD2F95F99"
+          }
+        ],
+        "/ResourceStack/Exports/Output{\"Fn::GetAtt\":[\"JobsQueue86ED6666\",\"Arn\"]}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputFnGetAttJobsQueue86ED6666ArnE154B711"
+          }
+        ],
+        "/ResourceStack/Exports/Output{\"Ref\":\"JobsTable1970BC16\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefJobsTable1970BC16EDB4A824"
+          }
+        ],
+        "/ResourceStack/Exports/Output{\"Ref\":\"RawBucket0C3EE094\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefRawBucket0C3EE094D6333DF9"
+          }
+        ],
+        "/ResourceStack/Exports/Output{\"Ref\":\"JobsQueue86ED6666\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefJobsQueue86ED6666E80AB877"
+          }
+        ],
+        "/ResourceStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/ResourceStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "ResourceStack"
+    },
+    "LambdaStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "LambdaStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "LambdaStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/us-west-2",
+      "properties": {
+        "templateFile": "LambdaStack.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-us-west-2",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-us-west-2",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-us-west-2/c5887820502e8a6941f0c0e7cacb6836f30c94a359637ab40c0ae3d9d2a82d35.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "LambdaStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-us-west-2",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "ResourceStack",
+        "LambdaStack.assets"
+      ],
+      "metadata": {
+        "/LambdaStack/ApiHandler": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "functionName": "*",
+              "runtime": "*",
+              "handler": "*",
+              "code": "*",
+              "timeout": "*",
+              "memorySize": "*",
+              "logRetention": 7,
+              "environment": "*"
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addEnvironment": [
+                "*",
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addEnvironment": [
+                "*",
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addEnvironment": [
+                "*",
+                "*"
+              ]
+            }
+          }
+        ],
+        "/LambdaStack/ApiHandler/ServiceRole": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "assumedBy": {
+                "principalAccount": "*",
+                "assumeRoleAction": "*"
+              },
+              "managedPolicies": [
+                {
+                  "managedPolicyArn": "*"
+                }
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToPrincipalPolicy": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachInlinePolicy": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachInlinePolicy": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToPrincipalPolicy": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToPrincipalPolicy": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToPrincipalPolicy": [
+                {}
+              ]
+            }
+          }
+        ],
+        "/LambdaStack/ApiHandler/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiHandlerServiceRole592E70E9"
+          }
+        ],
+        "/LambdaStack/ApiHandler/ServiceRole/DefaultPolicy": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": "*"
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachToRole": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachToRole": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addStatements": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addStatements": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addStatements": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addStatements": [
+                {}
+              ]
+            }
+          }
+        ],
+        "/LambdaStack/ApiHandler/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiHandlerServiceRoleDefaultPolicy10321D87"
+          }
+        ],
+        "/LambdaStack/ApiHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiHandler5E7490E8"
+          }
+        ],
+        "/LambdaStack/ApiHandler/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiHandlerLogRetention907E318F"
+          }
+        ],
+        "/LambdaStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "assumedBy": {
+                "principalAccount": "*",
+                "assumeRoleAction": "*"
+              },
+              "managedPolicies": [
+                {
+                  "managedPolicyArn": "*"
+                }
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToPrincipalPolicy": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachInlinePolicy": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachInlinePolicy": [
+                "*"
+              ]
+            }
+          }
+        ],
+        "/LambdaStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+          }
+        ],
+        "/LambdaStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": "*"
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachToRole": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachToRole": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addStatements": [
+                {}
+              ]
+            }
+          }
+        ],
+        "/LambdaStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB"
+          }
+        ],
+        "/LambdaStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A"
+          }
+        ],
+        "/LambdaStack/WorkerHandler": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "functionName": "*",
+              "runtime": "*",
+              "handler": "*",
+              "code": "*",
+              "timeout": "*",
+              "memorySize": "*",
+              "logRetention": 7,
+              "environment": "*"
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addEnvironment": [
+                "*",
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addEnvironment": [
+                "*",
+                "*"
+              ]
+            }
+          }
+        ],
+        "/LambdaStack/WorkerHandler/ServiceRole": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "assumedBy": {
+                "principalAccount": "*",
+                "assumeRoleAction": "*"
+              },
+              "managedPolicies": [
+                {
+                  "managedPolicyArn": "*"
+                }
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToPrincipalPolicy": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachInlinePolicy": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachInlinePolicy": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToPrincipalPolicy": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToPrincipalPolicy": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToPrincipalPolicy": [
+                {}
+              ]
+            }
+          }
+        ],
+        "/LambdaStack/WorkerHandler/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WorkerHandlerServiceRole44E72B52"
+          }
+        ],
+        "/LambdaStack/WorkerHandler/ServiceRole/DefaultPolicy": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": "*"
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachToRole": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "attachToRole": [
+                "*"
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addStatements": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addStatements": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addStatements": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addStatements": [
+                {}
+              ]
+            }
+          }
+        ],
+        "/LambdaStack/WorkerHandler/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WorkerHandlerServiceRoleDefaultPolicyF84F1411"
+          }
+        ],
+        "/LambdaStack/WorkerHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WorkerHandlerCD1D8137"
+          }
+        ],
+        "/LambdaStack/WorkerHandler/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WorkerHandlerLogRetention62F65CBC"
+          }
+        ],
+        "/LambdaStack/WorkerHandler/SqsEventSource:ResourceStackJobsQueue7743C4CC": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "target": "*",
+              "batchSize": "*",
+              "maxBatchingWindow": "*",
+              "maxConcurrency": "*",
+              "reportBatchItemFailures": "*",
+              "enabled": "*",
+              "eventSourceArn": "*",
+              "filters": "*",
+              "filterEncryption": "*",
+              "metricsConfig": "*"
+            }
+          }
+        ],
+        "/LambdaStack/WorkerHandler/SqsEventSource:ResourceStackJobsQueue7743C4CC/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WorkerHandlerSqsEventSourceResourceStackJobsQueue7743C4CC3135B71C"
+          }
+        ],
+        "/LambdaStack/JobsApi": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "restApiName": "*",
+              "deployOptions": {
+                "stageName": "*"
+              },
+              "defaultCorsPreflightOptions": {
+                "allowOrigins": "*",
+                "allowMethods": "*",
+                "allowHeaders": "*"
+              }
+            }
+          }
+        ],
+        "/LambdaStack/JobsApi/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApiFE3EF639"
+          }
+        ],
+        "/LambdaStack/JobsApi/Deployment": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "description": "*",
+              "api": "*",
+              "retainDeployments": "*"
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToLogicalId": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToLogicalId": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToLogicalId": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToLogicalId": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToLogicalId": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToLogicalId": [
+                {}
+              ]
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addToLogicalId": [
+                {}
+              ]
+            }
+          }
+        ],
+        "/LambdaStack/JobsApi/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApiDeployment652DAB98062c71a4fde17d7cb298144932362447"
+          }
+        ],
+        "/LambdaStack/JobsApi/DeploymentStage.prod": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "deployment": "*",
+              "stageName": "*"
+            }
+          }
+        ],
+        "/LambdaStack/JobsApi/DeploymentStage.prod/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApiDeploymentStageprod2FAA6CB6"
+          }
+        ],
+        "/LambdaStack/JobsApi/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApiEndpoint688FA854"
+          }
+        ],
+        "/LambdaStack/JobsApi/Default": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": "*"
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/OPTIONS": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "resource": "*",
+              "httpMethod": "*",
+              "integration": "*",
+              "options": {
+                "authorizer": {
+                  "authorizerId": "*",
+                  "authorizationType": "*"
+                },
+                "apiKeyRequired": false,
+                "authorizationType": "*",
+                "methodResponses": [
+                  {
+                    "statusCode": "*",
+                    "responseParameters": "*"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addMethodResponse": [
+                {
+                  "statusCode": "*",
+                  "responseParameters": "*"
+                }
+              ]
+            }
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApiOPTIONSFC70B70F"
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "parent": "*",
+              "pathPart": "*"
+            }
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobs71BD8C69"
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/OPTIONS": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "resource": "*",
+              "httpMethod": "*",
+              "integration": "*",
+              "options": {
+                "authorizer": {
+                  "authorizerId": "*",
+                  "authorizationType": "*"
+                },
+                "apiKeyRequired": false,
+                "authorizationType": "*",
+                "methodResponses": [
+                  {
+                    "statusCode": "*",
+                    "responseParameters": "*"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addMethodResponse": [
+                {
+                  "statusCode": "*",
+                  "responseParameters": "*"
+                }
+              ]
+            }
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsOPTIONS21D77CB1"
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/POST": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "resource": "*",
+              "httpMethod": "*",
+              "integration": "*",
+              "options": "*"
+            }
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/POST/ApiPermission.LambdaStackJobsApi9225F8A0.POST..jobs": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsPOSTApiPermissionLambdaStackJobsApi9225F8A0POSTjobs6E282625"
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/POST/ApiPermission.Test.LambdaStackJobsApi9225F8A0.POST..jobs": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsPOSTApiPermissionTestLambdaStackJobsApi9225F8A0POSTjobsB859EC6D"
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsPOST6D297CE3"
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/{job_id}": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "parent": "*",
+              "pathPart": "*"
+            }
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/{job_id}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsjobid806B6F67"
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/{job_id}/OPTIONS": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "resource": "*",
+              "httpMethod": "*",
+              "integration": "*",
+              "options": {
+                "authorizer": {
+                  "authorizerId": "*",
+                  "authorizationType": "*"
+                },
+                "apiKeyRequired": false,
+                "authorizationType": "*",
+                "methodResponses": [
+                  {
+                    "statusCode": "*",
+                    "responseParameters": "*"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "aws:cdk:analytics:method",
+            "data": {
+              "addMethodResponse": [
+                {
+                  "statusCode": "*",
+                  "responseParameters": "*"
+                }
+              ]
+            }
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/{job_id}/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsjobidOPTIONSC7EA1D54"
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/{job_id}/GET": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": {
+              "resource": "*",
+              "httpMethod": "*",
+              "integration": "*",
+              "options": "*"
+            }
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/{job_id}/GET/ApiPermission.LambdaStackJobsApi9225F8A0.GET..jobs.{job_id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsjobidGETApiPermissionLambdaStackJobsApi9225F8A0GETjobsjobidABD73B9E"
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/{job_id}/GET/ApiPermission.Test.LambdaStackJobsApi9225F8A0.GET..jobs.{job_id}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsjobidGETApiPermissionTestLambdaStackJobsApi9225F8A0GETjobsjobid736A0AAD"
+          }
+        ],
+        "/LambdaStack/JobsApi/Default/jobs/{job_id}/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JobsApijobsjobidGET8986E4E9"
+          }
+        ],
+        "/LambdaStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/LambdaStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/LambdaStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "LambdaStack"
     },
     "Tree": {
       "type": "cdk:tree",

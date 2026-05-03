@@ -85,14 +85,14 @@ def lint_ts(data_dir: str = "data/job_service", verbose: bool = False) -> None:
         logger.info("Lint complete: %d diagnostic(s) emitted", total_diagnostics)
 
 
-def lint_cfn(cdk_app_root: str = "data/job_service", stack_name: str = "SampleStack") -> None:
+def lint_cfn(cdk_app_root: str = "data/job_service", stack_names: list[str] = ["FullStack"]) -> None:
     """Only supports linting a single stack for now"""
-    path = Path(cdk_app_root) / "cdk.out" / f"{stack_name}.template.json"
-    logger.info("Start linting CloudFormation template at %s", path)
+    paths = [Path(cdk_app_root) / "cdk.out" / f"{stack_name}.template.json" for stack_name in stack_names]
+    logger.info("Start linting CloudFormation template at %s", paths)
 
     logger.info(f"Parsing CloudFormation template...")
     parser = CfnParser()
-    parser.parse(path)
+    parser.parse_all(paths)
     graph = parser.get_resource_graph()
     index = parser.get_resource_index()
 
