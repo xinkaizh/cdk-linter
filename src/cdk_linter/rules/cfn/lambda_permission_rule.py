@@ -7,7 +7,7 @@ from cdk_linter.core.cfn.cfn_resource import CfnResource
 from cdk_linter.core.cfn.resource_graph import GraphEdgeType, GraphNode, ResourceGraph
 from cdk_linter.core.cfn.resource_index import ResourceIndex
 from cdk_linter.core.cfn.resource_type import ResourceType
-from cdk_linter.core.diagnostic import Diagnostic, DiagnosticSeverity
+from cdk_linter.core.diagnostic import Diagnostic
 from cdk_linter.rules.rule import CfnRule
 
 
@@ -22,7 +22,7 @@ class PermissionSpec:
 
 
 class LambdaPermissionRule(CfnRule):
-    description = "Checks if lambda function has correct IAM permission"
+    description = "Checks if lambda function has enough IAM permission"
 
     # IAM actions are very granular. Here we define some commonly used actions for
     # read/write/delete operations. They are not meant to be comprehensive. Users
@@ -72,7 +72,6 @@ class LambdaPermissionRule(CfnRule):
             raise RuntimeError("Must call prime() before calling check()")
 
         diagnostics = []
-        expected_permissions: dict[tuple[str, str], set[str]] = {}
         for spec in self.specs:
             lambda_resource = index.find_resource_by_prefix(
                 spec.lambda_function_id, include_types=[ResourceType.LAMBDA]
@@ -94,12 +93,6 @@ class LambdaPermissionRule(CfnRule):
                 )
                 continue
 
-            # Save the actions implied by spec.txt so we can later spot grants
-            # that go beyond what the user declared.
-            expected_permissions.setdefault((lambda_resource.id, target_resource.id), set()).update(
-                self._get_required_actions(target_resource, access)
-            )
-
             # find execution role among all outgoing edges
             role = self._find_execution_role(graph, lambda_resource)
 
@@ -108,7 +101,6 @@ class LambdaPermissionRule(CfnRule):
                 missing_permission = self._form_missing_permission(target_resource, access)
                 message = f"Lambda function {spec.lambda_function_id} lacks {missing_permission} to resource {spec.target_id}"
                 diagnostics.append(Diagnostic(message=message))
-        diagnostics.extend(self._check_extra_permissions(graph, index, expected_permissions))
         return diagnostics
 
     def _check_execution_role(self, role: GraphNode, target_resource: CfnResource, access: str):
@@ -141,63 +133,6 @@ class LambdaPermissionRule(CfnRule):
                     return True
         return False
 
-    def _check_extra_permissions(
-        self,
-        graph: ResourceGraph,
-        index: ResourceIndex,
-        expected_permissions: dict[tuple[str, str], set[str]],
-    ) -> list[Diagnostic]:
-        # Collect by Lambda/resource first. one grouped diagnostic is easier to
-        # read than one line per IAM action.
-        extra_permissions: dict[tuple[str, str], set[str]] = {}
-        wildcard_permissions: dict[tuple[str, str], set[str]] = {}
-        for lambda_resource in index.get_resources_by_type(ResourceType.LAMBDA):
-            role = self._find_execution_role(graph, lambda_resource)
-            policy_edges = role.outgoing_edges
-            for policy_edge in policy_edges:
-                policy = policy_edge.destination
-                allowed_resources_edges = policy.outgoing_edges
-
-                for allowed_resources_edge in allowed_resources_edges:
-                    allowed_resource = allowed_resources_edge.destination.resource
-                    expected_actions = expected_permissions.get(
-                        (lambda_resource.id, allowed_resource.id), set()
-                    )
-
-                    for allowed_action in allowed_resources_edge.metadata["actions"]:
-                        # Wildcards are broader than normal extra permissions,
-                        # so keep them separate and report them as critical.
-                        if self._is_wildcard_permission(allowed_action, allowed_resource):
-                            wildcard_permissions.setdefault(
-                                (lambda_resource.id, allowed_resource.id), set()
-                            ).add(allowed_action)
-                            continue
-
-                        if self._is_expected_action(allowed_action, expected_actions):
-                            continue
-
-                        extra_permissions.setdefault(
-                            (lambda_resource.id, allowed_resource.id), set()
-                        ).add(allowed_action)
-
-        diagnostics = []
-        for (lambda_id, resource_id), actions in wildcard_permissions.items():
-            actions_str = ", ".join(sorted(actions))
-            message = (
-                f"Lambda function {lambda_id} has wildcard IAM permission(s) "
-                f"to resource {resource_id}: {actions_str}"
-            )
-            diagnostics.append(Diagnostic(message=message, severity=DiagnosticSeverity.CRITICAL))
-
-        for (lambda_id, resource_id), actions in extra_permissions.items():
-            actions_str = ", ".join(sorted(actions))
-            message = (
-                f"Lambda function {lambda_id} has {len(actions)} extra IAM permission(s) "
-                f"to resource {resource_id}: {actions_str}"
-            )
-            diagnostics.append(Diagnostic(message=message, severity=DiagnosticSeverity.WARNING))
-        return diagnostics
-
     def _find_execution_role(self, graph: ResourceGraph, lambda_resource: CfnResource) -> GraphNode:
         edges = graph.get_node_by_rid(lambda_resource.id).outgoing_edges
         for edge in edges:
@@ -207,14 +142,6 @@ class LambdaPermissionRule(CfnRule):
 
     def _get_required_actions(self, target_resource: CfnResource, access: str) -> list[str]:
         return self.COMMON_MAPPING[access][target_resource.type]
-
-    def _is_expected_action(self, allowed_action: str, expected_actions: set[str]) -> bool:
-        return any(
-            fnmatchcase(expected_action, allowed_action) for expected_action in expected_actions
-        )
-
-    def _is_wildcard_permission(self, allowed_action: str, allowed_resource: CfnResource) -> bool:
-        return "*" in allowed_action or allowed_resource.type == ResourceType.ALL
 
     def _form_missing_permission(self, target_resource: CfnResource, access: str) -> str:
         required_actions = self._get_required_actions(target_resource, access)
