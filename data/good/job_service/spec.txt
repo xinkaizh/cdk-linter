@@ -1,0 +1,4 @@
+ApiHandler w JobsTable,JobsQueue,RawBucket
+WorkerHandler r,w JobsTable
+WorkerHandler r,d JobsQueue
+WorkerHandler r RawBucket

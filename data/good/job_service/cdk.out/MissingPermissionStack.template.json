@@ -1,0 +1,1054 @@
+{
+ "Resources": {
+  "JobsTable1970BC16": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "job_id",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "job_id",
+      "KeyType": "HASH"
+     }
+    ],
+    "TableName": "cdk-playground-jobs"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsTable/Resource"
+   }
+  },
+  "RawBucket0C3EE094": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/RawBucket/Resource"
+   }
+  },
+  "RawBucketPolicy61C50A52": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "RawBucket0C3EE094"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:PutBucketPolicy"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "RawBucket0C3EE094",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "RawBucket0C3EE094",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/RawBucket/Policy/Resource"
+   }
+  },
+  "RawBucketAutoDeleteObjectsCustomResource4CB74628": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "RawBucket0C3EE094"
+    }
+   },
+   "DependsOn": [
+    "RawBucketPolicy61C50A52"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/RawBucket/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-west-2"
+     },
+     "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Lambda function for auto-deleting objects in ",
+       {
+        "Ref": "RawBucket0C3EE094"
+       },
+       " S3 bucket."
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+    "aws:asset:property": "Code"
+   }
+  },
+  "JobsDlqB53173A1": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "MessageRetentionPeriod": 1209600,
+    "QueueName": "cdk-playground-jobs-dlq"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsDlq/Resource"
+   }
+  },
+  "JobsQueue86ED6666": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "QueueName": "cdk-playground-jobs-queue",
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "JobsDlqB53173A1",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "VisibilityTimeout": 120
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsQueue/Resource"
+   }
+  },
+  "ApiHandlerServiceRole592E70E9": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/ApiHandler/ServiceRole/Resource"
+   }
+  },
+  "ApiHandler5E7490E8": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-west-2"
+     },
+     "S3Key": "715c720fefea5ff2c3f3ed613afca388669d391a8ad5778f57484c59cf5af86b.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "JOBS_TABLE_NAME": {
+       "Ref": "JobsTable1970BC16"
+      },
+      "RAW_BUCKET_NAME": {
+       "Ref": "RawBucket0C3EE094"
+      },
+      "QUEUE_URL": {
+       "Ref": "JobsQueue86ED6666"
+      }
+     }
+    },
+    "FunctionName": "cdk-playground-api-handler",
+    "Handler": "api_handler.lambda_handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "ApiHandlerServiceRole592E70E9",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Timeout": 15
+   },
+   "DependsOn": [
+    "ApiHandlerServiceRole592E70E9"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/ApiHandler/Resource",
+    "aws:asset:path": "asset.715c720fefea5ff2c3f3ed613afca388669d391a8ad5778f57484c59cf5af86b",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "ApiHandlerLogRetention907E318F": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "ApiHandler5E7490E8"
+       }
+      ]
+     ]
+    },
+    "RetentionInDays": 7
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/ApiHandler/LogRetention/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:DeleteRetentionPolicy",
+        "logs:PutRetentionPolicy"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+    "Roles": [
+     {
+      "Ref": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Handler": "index.handler",
+    "Runtime": "nodejs22.x",
+    "Timeout": 900,
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-west-2"
+     },
+     "S3Key": "2819175352ad1ce0dae768e83fc328fb70fb5f10b4a8ff0ccbcb791f02b0716d.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource",
+    "aws:asset:path": "asset.2819175352ad1ce0dae768e83fc328fb70fb5f10b4a8ff0ccbcb791f02b0716d",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "WorkerHandlerServiceRole44E72B52": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/WorkerHandler/ServiceRole/Resource"
+   }
+  },
+  "WorkerHandlerServiceRoleDefaultPolicyF84F1411": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:ChangeMessageVisibility",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:ReceiveMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "JobsQueue86ED6666",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "WorkerHandlerServiceRoleDefaultPolicyF84F1411",
+    "Roles": [
+     {
+      "Ref": "WorkerHandlerServiceRole44E72B52"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/WorkerHandler/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "WorkerHandlerCD1D8137": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-us-west-2"
+     },
+     "S3Key": "715c720fefea5ff2c3f3ed613afca388669d391a8ad5778f57484c59cf5af86b.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "JOBS_TABLE_NAME": {
+       "Ref": "JobsTable1970BC16"
+      },
+      "RAW_BUCKET_NAME": {
+       "Ref": "RawBucket0C3EE094"
+      }
+     }
+    },
+    "FunctionName": "cdk-playground-worker-handler",
+    "Handler": "worker_handler.lambda_handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "WorkerHandlerServiceRole44E72B52",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12",
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "WorkerHandlerServiceRoleDefaultPolicyF84F1411",
+    "WorkerHandlerServiceRole44E72B52"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/WorkerHandler/Resource",
+    "aws:asset:path": "asset.715c720fefea5ff2c3f3ed613afca388669d391a8ad5778f57484c59cf5af86b",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "WorkerHandlerLogRetention62F65CBC": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "WorkerHandlerCD1D8137"
+       }
+      ]
+     ]
+    },
+    "RetentionInDays": 7
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/WorkerHandler/LogRetention/Resource"
+   }
+  },
+  "WorkerHandlerSqsEventSourceMissingPermissionStackJobsQueue5E28430C77B8FC2E": {
+   "Type": "AWS::Lambda::EventSourceMapping",
+   "Properties": {
+    "BatchSize": 1,
+    "EventSourceArn": {
+     "Fn::GetAtt": [
+      "JobsQueue86ED6666",
+      "Arn"
+     ]
+    },
+    "FunctionName": {
+     "Ref": "WorkerHandlerCD1D8137"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/WorkerHandler/SqsEventSource:MissingPermissionStackJobsQueue5E28430C/Resource"
+   }
+  },
+  "JobsApiFE3EF639": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Name": "cdk-playground-jobs-api"
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsApi/Resource"
+   }
+  },
+  "JobsApiDeployment652DAB9848aa36f1d64bf3e4637197e58f244a3a": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Automatically created by the RestApi construct",
+    "RestApiId": {
+     "Ref": "JobsApiFE3EF639"
+    }
+   },
+   "DependsOn": [
+    "JobsApijobsjobidGET8986E4E9",
+    "JobsApijobsjobidOPTIONSC7EA1D54",
+    "JobsApijobsjobid806B6F67",
+    "JobsApijobsOPTIONS21D77CB1",
+    "JobsApijobsPOST6D297CE3",
+    "JobsApijobs71BD8C69",
+    "JobsApiOPTIONSFC70B70F"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsApi/Deployment/Resource",
+    "aws:cdk:do-not-refactor": true
+   }
+  },
+  "JobsApiDeploymentStageprod2FAA6CB6": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "JobsApiDeployment652DAB9848aa36f1d64bf3e4637197e58f244a3a"
+    },
+    "RestApiId": {
+     "Ref": "JobsApiFE3EF639"
+    },
+    "StageName": "prod"
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsApi/DeploymentStage.prod/Resource"
+   }
+  },
+  "JobsApiOPTIONSFC70B70F": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Fn::GetAtt": [
+      "JobsApiFE3EF639",
+      "RootResourceId"
+     ]
+    },
+    "RestApiId": {
+     "Ref": "JobsApiFE3EF639"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsApi/Default/OPTIONS/Resource"
+   }
+  },
+  "JobsApijobs71BD8C69": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "JobsApiFE3EF639",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "jobs",
+    "RestApiId": {
+     "Ref": "JobsApiFE3EF639"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsApi/Default/jobs/Resource"
+   }
+  },
+  "JobsApijobsOPTIONS21D77CB1": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "JobsApijobs71BD8C69"
+    },
+    "RestApiId": {
+     "Ref": "JobsApiFE3EF639"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsApi/Default/jobs/OPTIONS/Resource"
+   }
+  },
+  "JobsApijobsPOSTApiPermissionMissingPermissionStackJobsApi992CBEB4POSTjobsD4BC222D": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ApiHandler5E7490E8",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "JobsApiFE3EF639"
+       },
+       "/",
+       {
+        "Ref": "JobsApiDeploymentStageprod2FAA6CB6"
+       },
+       "/POST/jobs"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsApi/Default/jobs/POST/ApiPermission.MissingPermissionStackJobsApi992CBEB4.POST..jobs"
+   }
+  },
+  "JobsApijobsPOSTApiPermissionTestMissingPermissionStackJobsApi992CBEB4POSTjobs24650EC5": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ApiHandler5E7490E8",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "JobsApiFE3EF639"
+       },
+       "/test-invoke-stage/POST/jobs"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsApi/Default/jobs/POST/ApiPermission.Test.MissingPermissionStackJobsApi992CBEB4.POST..jobs"
+   }
+  },
+  "JobsApijobsPOST6D297CE3": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ApiHandler5E7490E8",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "JobsApijobs71BD8C69"
+    },
+    "RestApiId": {
+     "Ref": "JobsApiFE3EF639"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsApi/Default/jobs/POST/Resource"
+   }
+  },
+  "JobsApijobsjobid806B6F67": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "JobsApijobs71BD8C69"
+    },
+    "PathPart": "{job_id}",
+    "RestApiId": {
+     "Ref": "JobsApiFE3EF639"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsApi/Default/jobs/{job_id}/Resource"
+   }
+  },
+  "JobsApijobsjobidOPTIONSC7EA1D54": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "ApiKeyRequired": false,
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'",
+        "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET,PUT,POST,DELETE,PATCH,HEAD'"
+       },
+       "StatusCode": "204"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{ statusCode: 200 }"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Origin": true,
+       "method.response.header.Access-Control-Allow-Methods": true
+      },
+      "StatusCode": "204"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "JobsApijobsjobid806B6F67"
+    },
+    "RestApiId": {
+     "Ref": "JobsApiFE3EF639"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsApi/Default/jobs/{job_id}/OPTIONS/Resource"
+   }
+  },
+  "JobsApijobsjobidGETApiPermissionMissingPermissionStackJobsApi992CBEB4GETjobsjobidA8414E7B": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ApiHandler5E7490E8",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "JobsApiFE3EF639"
+       },
+       "/",
+       {
+        "Ref": "JobsApiDeploymentStageprod2FAA6CB6"
+       },
+       "/GET/jobs/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsApi/Default/jobs/{job_id}/GET/ApiPermission.MissingPermissionStackJobsApi992CBEB4.GET..jobs.{job_id}"
+   }
+  },
+  "JobsApijobsjobidGETApiPermissionTestMissingPermissionStackJobsApi992CBEB4GETjobsjobidB79244EA": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "ApiHandler5E7490E8",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:",
+       {
+        "Ref": "AWS::AccountId"
+       },
+       ":",
+       {
+        "Ref": "JobsApiFE3EF639"
+       },
+       "/test-invoke-stage/GET/jobs/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsApi/Default/jobs/{job_id}/GET/ApiPermission.Test.MissingPermissionStackJobsApi992CBEB4.GET..jobs.{job_id}"
+   }
+  },
+  "JobsApijobsjobidGET8986E4E9": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "ApiHandler5E7490E8",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "JobsApijobsjobid806B6F67"
+    },
+    "RestApiId": {
+     "Ref": "JobsApiFE3EF639"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/JobsApi/Default/jobs/{job_id}/GET/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/+1XX2/bNhD/LOVjwWhtNmBY3hzXxYImi2t7GAYjCM7iWb6EIhXy5FQV9N0LUpKlJGiLoUWwAn2ieHc8/u4/dZwc//Y6efUC7v1Rqm6PNG2SesmQ3kq499e1qgzkVm2SegUbjetacFj/ghzFiXgppCjAMTFZ8w4rcVILM7C4KsLnUjRSbEhrMtmFVYE0n/x7PZ8trhez93/PlishhcPc7kHPraa0EidCoWdnK9FcyenWxMsb6X9N6tMyvUVe1wJKtm9QI+Pl5gZT9uKEXYlfU9Wel+3SyqxrsYnbiHss1vI74VPwAcOdT+r3JZbBGXdhHTnDIaMJzpijI6sO1M8Akk817MnThjRxtaIcbckdXSGoc2RGF+8Onr5rPyI7hw8LTJH2OLWl6Qz5miuipkZqyDcKkvptadKAfV2Lbfc5Nq00TIfdDozS6Lpd2kY1xvwB6hxz66olfezZ2maL3kfi5Hcp0OzJWZPjAXQtQKnZmLyOR1+Kq29j/pBGxUD1kZGzPRpe2tKleAFFQSaLFeky7MFtgNPdCFsOH04DiUz2Dxll7wf61Jq0dA5NTI02UQvrOMqfMeZvgXTp0HdcNKEK+6TGAcrEmY64Jc3o/IPdzKSuKlrfdP5jR6mfWrOlbFRyT40L1Dm6nLwnaxpJkCf1wsY+BN6XOarT2HQKRyalAvQkTQ/5LzuZcGCSHgA0wXgDGapYFhTsW9cPaFVvUdNG5xmvUmpl5/0Vfd2u647LDOnuzGgyeOAdcuiLzB/chJggAZrsWnZA3B9Y2cB5oucpWaklA2OoMd9D+l6KIsIWXBhU1+A9sk8mYZHaZj45H7UJCQVlwHgPVVIv0POkoHUtXPs16lAKC22ry1g/PgTPM2TDwGiCxBZKzVPr/NzhVlO245E8aG3vLx1lZPq6jKQL5J1VD0h/Iqi+epvO5S0g+SbCCPau6zBFUkfjkoaChgkIZAZxP26AK3tuM0pBn6lRRvyf6NHoAb1cBm9Hk3tSZ+ejMMRzUVgu0MceFp4LMWNk6+o2vJHVzxvmouV1BDKMmYORY+0okCXvrKOPYUCNd2f96Z4Uz6/at1fMECjoHVYLvCvJhf69Be3xc/KxP++sWqAvrPFdvXsGLv10GImuY8/BQY6Hpt9cNZ1vLx5o+a9K5E9nPZezuvL86e7nc3fsFu2BQ7tY1+FXamgwBfBuDm54QH6B27fqqKhpBp2x/UxLzzZ/RBvkH/Hnzu5JoQvtS8bpFdpa9xi7LLkouZHGKkxu/C/741fJ6z+S4xc3nuioe00ni3b9BCTMaXdcDgAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "MissingPermissionStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "JobsApiEndpoint688FA854": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "JobsApiFE3EF639"
+      },
+      ".execute-api.us-west-2.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "JobsApiDeploymentStageprod2FAA6CB6"
+      },
+      "/"
+     ]
+    ]
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

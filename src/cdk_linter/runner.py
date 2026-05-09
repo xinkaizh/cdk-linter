@@ -52,11 +52,11 @@ def _discover_rules() -> list[BaseRule]:
     return rules
 
 
-def lint_ts(data_dir: str = "data/job_service", verbose: bool = False) -> None:
+def lint_ts(data_dir: str = "data/good/job_service", verbose: bool = False) -> None:
     """Lint all TypeScript CDK files under DATA_DIR.
 
     Args:
-        data_dir: Root directory containing .ts CDK source files. Defaults to "data".
+        data_dir: Root directory containing .ts CDK source files.
         verbose: Enable debug-level logging.
     """
     logger.info("Starting TypeScript lint on %s", data_dir)
@@ -65,7 +65,7 @@ def lint_ts(data_dir: str = "data/job_service", verbose: bool = False) -> None:
     parsed_files: list[FileStatementTree] = parse_directory(Path(data_dir))
 
     rules: list[TsRule] = [r for r in _discover_rules() if isinstance(r, TsRule)]
-    logger.info("Founds %d CFN rule(s)", len(rules))
+    logger.info("Found %d TS rule(s)", len(rules))
 
     total_diagnostics = 0
     for rule in rules:
@@ -85,9 +85,13 @@ def lint_ts(data_dir: str = "data/job_service", verbose: bool = False) -> None:
         logger.info("Lint complete: %d diagnostic(s) emitted", total_diagnostics)
 
 
-def lint_cfn(cdk_app_root: str = "data/job_service", stack_names: list[str] = ["FullStack"]) -> None:
+def lint_cfn(
+    cdk_app_root: str = "data/good/job_service", stack_names: list[str] = ["FullStack"]
+) -> None:
     """Only supports linting a single stack for now"""
-    paths = [Path(cdk_app_root) / "cdk.out" / f"{stack_name}.template.json" for stack_name in stack_names]
+    paths = [
+        Path(cdk_app_root) / "cdk.out" / f"{stack_name}.template.json" for stack_name in stack_names
+    ]
     logger.info("Start linting CloudFormation template at %s", paths)
 
     logger.info(f"Parsing CloudFormation template...")
@@ -99,7 +103,7 @@ def lint_cfn(cdk_app_root: str = "data/job_service", stack_names: list[str] = ["
     visualize(graph)
 
     rules: list[CfnRule] = [r for r in _discover_rules() if isinstance(r, CfnRule)]
-    logger.info("Founds %d CFN rule(s)", len(rules))
+    logger.info("Found %d CFN rule(s)", len(rules))
 
     total_diagnostics = 0
     for rule in rules:
