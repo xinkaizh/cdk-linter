@@ -1,63 +1,31 @@
 import logging
 from pathlib import Path
-from typing import Iterator
 
 from cdk_linter.core.diagnostic import Diagnostic
 from cdk_linter.core.ts.statement_tree import FileStatementTree, StatementTree
 from cdk_linter.rules.rule import TsRule
+from cdk_linter.rules.ts.ast_helpers import (
+    first_argument,
+    is_member_call,
+    string_literal_value,
+    walk_tree,
+)
 
 logger = logging.getLogger(__name__)
 
 
-def _walk_tree(node: StatementTree) -> Iterator[StatementTree]:
-    yield node
-    for child in node.children:
-        yield from _walk_tree(child)
-
-
-def _is_from_asset_call(node: StatementTree) -> bool:
-    if node.type != "call_expression":
-        return False
-
-    if not node.children:
-        return False
-
-    function_node = node.children[0]
-    if function_node.type != "member_expression" or not function_node.children:
-        return False
-
-    return function_node.children[-1].snippet == "fromAsset"
-
-
-def _get_first_argument(node: StatementTree) -> StatementTree | None:
-    if node.type != "call_expression":
-        return None
-
-    arguments_node = next((child for child in node.children if child.type == "arguments"), None)
-    if arguments_node is None:
-        return None
-
-    for argument in arguments_node.children:
-        if argument.type != "comment":
-            return argument
-    return None
-
-
 def _check_statement(stmt: StatementTree, file: Path, violations: list[Diagnostic]) -> None:
-    for node in _walk_tree(stmt):
-        if not _is_from_asset_call(node):
+    for node in walk_tree(stmt):
+        if not is_member_call(node, "fromAsset"):
             continue
 
-        first_arg = _get_first_argument(node)
+        first_arg = first_argument(node)
         if first_arg is None:
             continue
-        if first_arg.type != "string":
-            continue
 
-        raw = first_arg.snippet
-        if len(raw) < 2:
+        value = string_literal_value(first_arg)
+        if value is None:
             continue
-        value = raw[1:-1]  # strip surrounding quote character
 
         if not (value.endswith("/") or value.endswith(".zip")):
             line = node.start_line
