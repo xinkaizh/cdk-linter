@@ -1,6 +1,91 @@
 # cdk-linter
 Final project for Programming Tools class at UCB.
 
+### Examples
+
+Run the TypeScript rules against the default fixture:
+
+```bash
+uv run linter ts
+```
+
+This scans `data/good/job_service`, reports which TS rules ran, and should finish cleanly:
+
+```text
+Starting TypeScript lint on data/good/job_service
+Found 3 TS rule(s)
+Running rule: Checks literal CDK AWS resource names for common naming and length limits
+Running rule: Checks if asset path for Lambda function is properly configured
+Running rule: Checks if S3 bucket names are valid in format
+Lint complete: no issues found
+```
+
+Run the TypeScript rules against another clean fixture:
+
+```bash
+uv run linter ts data/good/ec2_vpc
+```
+
+This should also end with `Lint complete: no issues found`.
+
+Run the TypeScript rules against the intentionally bad fixture:
+
+```bash
+uv run linter ts data/bad/ts_all_rules
+```
+
+This should emit diagnostics for invalid AWS names and Lambda asset paths, then end with:
+
+```text
+Lint complete: 12 diagnostic(s) emitted
+```
+
+The diagnostics include messages such as:
+
+```text
+data/bad/ts_all_rules/app.ts:26 IAM roleName 'Bad*Role' is invalid
+data/bad/ts_all_rules/app.ts:23 lambda.Code.fromAsset() path must be a directory
+data/bad/ts_all_rules/app.ts:20 S3 bucketName 'Invalid_Bucket' is invalid
+```
+
+Run the CloudFormation permission rule against the default clean stack:
+
+```bash
+uv run linter cfn
+```
+
+By default this reads `data/good/job_service/cdk.out/FullStack.template.json`, uses
+`data/good/job_service/spec.txt`, runs the CFN rule, and should finish with no issues.
+
+To make the stack explicit:
+
+```bash
+uv run linter cfn data/good/job_service --stack_names '["FullStack"]'
+```
+
+Run the CloudFormation rule against the intentionally bad permission fixture:
+
+```bash
+uv run linter cfn data/bad/job_service_missing_permissions --stack_names '["MissingPermissionStack"]'
+```
+
+This should emit missing-permission diagnostics and end with:
+
+```text
+Lint complete: 8 diagnostic(s) emitted
+```
+
+The diagnostics include messages such as:
+
+```text
+Lambda function ApiHandler lacks IAM write permission to resource JobsTable
+Lambda function WorkerHandler lacks IAM read permission to resource JobsTable
+Lambda function WorkerHandler lacks IAM write permission to resource RawBucket
+```
+
+The CFN command also attempts to render `dependency_graph.svg` from the parsed stack graph. If
+Graphviz cannot render the generated graph, the linter logs a warning but still runs the CFN rules.
+
 ## Development
 This Python project uses UV for dependency management.
 
