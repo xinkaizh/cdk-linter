@@ -74,6 +74,24 @@ class BadTsAllRulesStack extends cdk.Stack {
     new ecr.Repository(this, 'InvalidRepositoryName', {
       repositoryName: 'Team/Service',
     });
+
+    new lambda.Function(this, 'TimeoutTooLong', {
+      functionName: 'timeout-too-long',
+      code: lambda.Code.fromAsset('lambda/'),
+      handler: 'index.handler',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      timeout: cdk.Duration.minutes(20),
+    });
+
+    new sqs.Queue(this, 'RetentionTooShort', {
+      queueName: 'retention-too-short',
+      retentionPeriod: cdk.Duration.seconds(30),
+    });
+
+    new sqs.Queue(this, 'ReceiveWaitTooLong', {
+      queueName: 'receive-wait-too-long',
+      receiveMessageWaitTime: cdk.Duration.seconds(45),
+    });
   }
 }
 

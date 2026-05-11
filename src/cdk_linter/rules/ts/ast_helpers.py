@@ -88,6 +88,53 @@ def boolean_literal_value(node: StatementTree) -> bool | None:
     return None
 
 
+_DURATION_UNIT_SECONDS: dict[str, int] = {
+    "millis": 0,  # treated as <1s; see duration_literal_seconds
+    "seconds": 1,
+    "minutes": 60,
+    "hours": 3600,
+    "days": 86400,
+}
+
+
+def duration_literal_seconds(node: StatementTree) -> int | None:
+    """Resolve a literal ``Duration.<unit>(<number>)`` call to whole seconds.
+
+    Returns ``None`` if the node is not such a call, the argument is not a
+    plain numeric literal, or the unit is sub-second (``millis``).
+    """
+    if node.type != "call_expression" or len(node.children) < 2:
+        return None
+
+    callee = node.children[0]
+    if callee.type != "member_expression" or len(callee.children) < 2:
+        return None
+
+    # Accept both `Duration.<unit>(...)` and `<ns>.Duration.<unit>(...)` (e.g. `cdk.Duration`).
+    object_node = callee.children[0]
+    object_final = (
+        object_node.children[-1].snippet
+        if object_node.type == "member_expression" and object_node.children
+        else object_node.snippet
+    )
+    if object_final != "Duration":
+        return None
+
+    unit = callee.children[-1].snippet
+    multiplier = _DURATION_UNIT_SECONDS.get(unit)
+    if not multiplier:
+        return None
+
+    arg = first_argument(node)
+    if arg is None or arg.type != "number":
+        return None
+    try:
+        amount = int(arg.snippet)
+    except ValueError:
+        return None
+    return amount * multiplier
+
+
 def member_expression_final_name(node: StatementTree) -> str | None:
     if node.type != "member_expression" or not node.children:
         return None
