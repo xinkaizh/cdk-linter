@@ -1,117 +1,90 @@
-# cdk-linter
-Final project for Programming Tools class at UCB.
+# CDK Linter
 
-### Examples
+Final project for the Programming Tools class at UC Berkeley.
 
-Run the TypeScript rules against the default fixture:
+## Setup
 
-```bash
-uv run linter ts
-```
+This project uses [uv](https://docs.astral.sh/uv/) to manage the Python runtime and dependencies.
 
-This scans `data/good/job_service`, reports which TS rules ran, and should finish cleanly:
+To set up the environment, run `uv sync`.
 
-```text
-Starting TypeScript lint on data/good/job_service
-Found 3 TS rule(s)
-Running rule: Checks literal CDK AWS resource names for common naming and length limits
-Running rule: Checks if asset path for Lambda function is properly configured
-Running rule: Checks if S3 bucket names are valid in format
-Lint complete: no issues found
-```
+## Examples
 
-Run the TypeScript rules against another clean fixture:
+CDK Linter supports two modes: TypeScript linting and CloudFormation linting.
+
+### TypeScript Mode
+
+To lint TypeScript CDK code, run `uv run linter ts <directory>`.
+
+If no directory is provided, the linter defaults to `data/good/job_service`.
+
+Sample commands:
 
 ```bash
+# These should run cleanly without errors.
+uv run linter ts data/good/job_service
 uv run linter ts data/good/ec2_vpc
-```
 
-This should also end with `Lint complete: no issues found`.
-
-Run the TypeScript rules against the intentionally bad fixture:
-
-```bash
+# This should emit error diagnostics.
 uv run linter ts data/bad/ts_all_rules
 ```
 
-This should emit diagnostics for invalid AWS names and Lambda asset paths, then end with:
+### CloudFormation Mode
 
-```text
-Lint complete: 12 diagnostic(s) emitted
-```
+To lint CloudFormation templates, run `uv run linter cfn <directory> <stack_name_1> <stack_name_2> ...`.
 
-The diagnostics include messages such as:
+A user specification file named `spec.txt` must be present under the specified directory.
 
-```text
-data/bad/ts_all_rules/app.ts:26 IAM roleName 'Bad*Role' is invalid
-data/bad/ts_all_rules/app.ts:23 lambda.Code.fromAsset() path must be a directory
-data/bad/ts_all_rules/app.ts:20 S3 bucketName 'Invalid_Bucket' is invalid
-```
+If no parameters are provided, the linter defaults to `data/good/job_service` and `FullStack`.
 
-Run the CloudFormation permission rule against the default clean stack:
+Sample commands:
 
 ```bash
-uv run linter cfn
+# All resources are created within a single stack.
+uv run linter cfn data/good/job_service FullStack
+
+# Resources are split across two stacks.
+uv run linter cfn data/good/job_service ResourceStack LambdaStack
+
+# The linter can infer dependencies between stacks and read them in the correct order.
+uv run linter cfn data/good/job_service LambdaStack ResourceStack
+
+# Missing IAM permission; this should emit diagnostics.
+uv run linter cfn data/bad/job_service MissingPermissionStack
 ```
-
-By default this reads `data/good/job_service/cdk.out/FullStack.template.json`, uses
-`data/good/job_service/spec.txt`, runs the CFN rule, and should finish with no issues.
-
-To make the stack explicit:
-
-```bash
-uv run linter cfn data/good/job_service --stack_names '["FullStack"]'
-```
-
-Run the CloudFormation rule against the intentionally bad permission fixture:
-
-```bash
-uv run linter cfn data/bad/job_service_missing_permissions --stack_names '["MissingPermissionStack"]'
-```
-
-This should emit missing-permission diagnostics and end with:
-
-```text
-Lint complete: 8 diagnostic(s) emitted
-```
-
-The diagnostics include messages such as:
-
-```text
-Lambda function ApiHandler lacks IAM write permission to resource JobsTable
-Lambda function WorkerHandler lacks IAM read permission to resource JobsTable
-Lambda function WorkerHandler lacks IAM write permission to resource RawBucket
-```
-
-The CFN command also attempts to render `dependency_graph.svg` from the parsed stack graph. If
-Graphviz cannot render the generated graph, the linter logs a warning but still runs the CFN rules.
 
 ## Development
-This Python project uses UV for dependency management.
 
-To sync environment: `uv sync`
+This Python project uses `uv` for dependency management.
 
-To add dependency: `uv add <pkg>`
+To sync the environment, run `uv sync`.
 
-To regenerate lock file: `uv lock`
+To add a dependency, run `uv add <pkg>`.
 
-To execute linter: `uv run linter <ts/cfn>` (this runs `run()` in `src/cdk_linter/runner.py`)
+To regenerate the lock file, run `uv lock`.
 
-Default fixtures live under `data/good/job_service`. Additional fixtures are split into
-`data/good/` for clean cases and `data/bad/` for cases that should emit diagnostics.
+To run the linter, use `uv run linter <ts/cfn>`. This runs `run()` in `src/cdk_linter/runner.py`.
 
-To execute dev linter (as a playground): `uv run dev` (this runs `run()` in `src/cdk_linter/dev.py`)
+Default fixtures live under `data/good/job_service`.
 
-To clean cache files: `uv run clean` (this runs `clean()` in `src/cdk_linter/dev.py`)
+Additional fixtures are organized under `data/good/` for clean cases and `data/bad/` for cases that should emit diagnostics.
 
-To format code (and optimizing imports):
-```
+To run the development playground, use `uv run dev`. This runs `run()` in `src/cdk_linter/dev.py`.
+
+To clean cache files, use `uv run clean`. This runs `clean()` in `src/cdk_linter/dev.py`.
+
+To format code and optimize imports, run:
+
+```bash
 uv run autoflake . --recursive --in-place
 uv run isort .
 uv run black .
 ```
 
-## Structure
-The CDK linter code is located in `src/cdk_linter`.
+## Project Structure
 
-The `data/` folder contains simple CDK apps adapted from https://github.com/xinkaizh/cdk-playground. The `cdk.out/` directories contain output generated by running `cdk synth`.
+The CDK linter implementation is located in `src/cdk_linter`.
+
+The `data/` directory contains simple CDK apps adapted from `https://github.com/xinkaizh/cdk-playground`.
+
+The `cdk.out/` directories contain CloudFormation output generated by running `cdk synth`.
