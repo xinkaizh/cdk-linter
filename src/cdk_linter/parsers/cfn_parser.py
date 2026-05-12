@@ -23,6 +23,7 @@ class CfnParser:
     def __init__(self) -> None:
         self._resource_index = ResourceIndex()
         self._resource_graph = ResourceGraph()
+        self._exports = dict[str, str]()  # export ref to resource ID
         self._supported_types = {t.value for t in ResourceType}
 
     def parse_all(self, paths: list[str | Path]):
@@ -45,8 +46,12 @@ class CfnParser:
         with open(path, "r") as f:
             data = json.load(f)
         resources = data["Resources"]
+        outputs = data["Outputs"]
+
+        self._handle_exports(outputs)
 
         # add all supported resources to both index and dependency graph
+        parsed_resources: list[CfnResource] = []
         for id, body in resources.items():
             type_str = body["Type"]
             if type_str not in self._supported_types:
@@ -55,9 +60,11 @@ class CfnParser:
             resource = CfnResource(id=id, type=type, properties=body["Properties"])
             self._resource_index.add(resource)
             self._resource_graph.add_resource(resource)
+            parsed_resources.append(resource)
 
-        # build up connections in dependency graph
-        for res in self._resource_index.get_all_resources():
+        # build connections only for resources from this template. Reprocessing
+        # earlier templates would append duplicate edges and hide ordering bugs.
+        for res in parsed_resources:
             match res.type:
                 case ResourceType.POLICY:
                     self._handle_iam_policy(res)
@@ -76,6 +83,19 @@ class CfnParser:
             raise ValueError("no CFN template has been parsed yet")
         return self._resource_graph
 
+    def _handle_exports(self, outputs: dict):
+        for k, v in outputs.items():
+            if k.startswith("Export"):
+                export_name = v["Export"]["Name"]
+                # try Fn::GetAtt or Ref
+                export_resource_id = (v["Value"].get("Fn::GetAtt") or [None])[0]
+                if not export_resource_id:
+                    export_resource_id = v["Value"].get("Ref")
+                if not export_resource_id:
+                    logger.warning(f"Ignoring unrecognized export format: {v}")
+                    continue
+                self._exports[export_name] = export_resource_id
+
     def _handle_iam_policy(self, policy_resource: CfnResource):
         """Parsing logic for IAM policies"""
         roles = policy_resource.properties.get("Roles")
@@ -86,6 +106,8 @@ class CfnParser:
         for role in roles:
             role_id = role["Ref"]
             role_resource = self._resource_index.get_resource_by_id(role_id)
+            if role_resource is None:
+                raise ValueError(f"Couldn't find role {role_id} referenced by IAM Policy {policy_resource.id}")
             self._resource_graph.connect_resources(
                 source=role_resource,
                 destination=policy_resource,
@@ -113,10 +135,17 @@ class CfnParser:
                 resource = [resource]
 
             for res in resource:
-                if "Fn::GetAtt" not in res:
+                if "Fn::GetAtt" in res:
+                    rid = res["Fn::GetAtt"][0]
+                elif "Fn::ImportValue" in res:
+                    ref = res["Fn::ImportValue"]
+                    rid = self._exports.get(ref)
+                    if not rid:
+                        raise ValueError(f"Couldn't find import {ref}")
+                else:
                     logger.warning(f"Ignored unsupported way for resource reference {res}")
                     continue
-                rid = res["Fn::GetAtt"][0]
+                
                 self._resource_graph.connect_resources(
                     source=policy_resource,
                     destination=self._resource_index.get_resource_by_id(rid),
@@ -142,6 +171,8 @@ class CfnParser:
         execution_role = lambda_resource.properties["Role"]
         role_id = _extract_id(execution_role)
         role_resource = self._resource_index.get_resource_by_id(role_id)
+        if role_resource is None:
+            raise ValueError(f"Couldn't find execution role {role_id} referenced by Lambda {lambda_resource.id}")
         self._resource_graph.connect_resources(
             source=lambda_resource,
             destination=role_resource,

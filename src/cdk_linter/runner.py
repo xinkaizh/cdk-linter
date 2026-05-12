@@ -1,5 +1,6 @@
 import importlib
 import inspect
+import json
 import logging
 import pkgutil
 from pathlib import Path
@@ -85,13 +86,59 @@ def lint_ts(data_dir: str = "data/good/job_service", verbose: bool = False) -> N
         logger.info("Lint complete: %d diagnostic(s) emitted", total_diagnostics)
 
 
-def lint_cfn(
-    cdk_app_root: str = "data/good/job_service", stack_names: list[str] = ["FullStack"]
-) -> None:
-    """Only supports linting a single stack for now"""
-    paths = [
-        Path(cdk_app_root) / "cdk.out" / f"{stack_name}.template.json" for stack_name in stack_names
-    ]
+def _order_cfn_stacks_from_manifest(cdk_app_root: str, stack_names: tuple[str, ...]) -> tuple[str, ...]:
+    """
+    topologically sort the stacks if there are dependencies
+    """
+    manifest_path = Path(cdk_app_root) / "cdk.out" / "manifest.json"
+    if not manifest_path.exists():
+        return stack_names
+
+    with open(manifest_path, "r") as f:
+        manifest = json.load(f)
+
+    artifacts = manifest.get("artifacts", {})
+    requested_stacks = set(stack_names)
+    dependencies = {
+        stack_name: [
+            dependency
+            for dependency in artifacts.get(stack_name, {}).get("dependencies", [])
+            if dependency in requested_stacks
+            and artifacts.get(dependency, {}).get("type") == "aws:cloudformation:stack"
+        ]
+        for stack_name in stack_names
+    }
+
+    ordered: list[str] = []
+    visiting: set[str] = set()
+    visited: set[str] = set()
+
+    def visit(stack_name: str) -> None:
+        if stack_name in visited:
+            return
+        if stack_name in visiting:
+            raise ValueError(f"Circular stack dependency found while ordering {stack_name}")
+
+        visiting.add(stack_name)
+        for dependency in dependencies[stack_name]:
+            visit(dependency)
+        visiting.remove(stack_name)
+        visited.add(stack_name)
+        ordered.append(stack_name)
+
+    for stack_name in stack_names:
+        visit(stack_name)
+
+    return tuple(ordered)
+
+
+def lint_cfn(cdk_app_root: str = "data/good/job_service", *stack_names: str) -> None:
+    """Lint one or more CloudFormation stacks."""
+    if not stack_names:
+        stack_names = ("FullStack",)
+
+    stack_names = _order_cfn_stacks_from_manifest(cdk_app_root, stack_names)
+    paths = [Path(cdk_app_root) / "cdk.out" / f"{stack_name}.template.json" for stack_name in stack_names]
     logger.info("Start linting CloudFormation template at %s", paths)
 
     logger.info(f"Parsing CloudFormation template...")
