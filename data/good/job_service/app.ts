@@ -3,20 +3,11 @@ import * as cdk from 'aws-cdk-lib';
 import { FullStack } from '../lib/full-stack';
 import { ResourceStack } from '../lib/resource-stack';
 import { LambdaStack } from '../lib/lambda-stack';
-import { MissingPermissionStack } from '../lib/missing-permission-stack';
 
 const app = new cdk.App();
 
 // full stack containing all resources and lambda functions
 new FullStack(app, 'FullStack', {
-  env: {
-    account: process.env.CDK_DEFAULT_ACCOUNT,
-    region: process.env.CDK_DEFAULT_REGION
-  }
-});
-
-// full stack (but missing IAM permissions)
-new MissingPermissionStack(app, 'MissingPermissionStack', {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION
